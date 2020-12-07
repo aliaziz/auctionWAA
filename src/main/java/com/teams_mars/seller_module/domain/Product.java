@@ -38,4 +38,8 @@ public class Product {
     private String description;
     private LocalDate bidDueDate;
     private LocalDate bidPaymentDueDate;
+    private boolean isClosed;
+    private boolean isPaymentMade;
+    private boolean isShipped;
+    private boolean isReceived;
 }
