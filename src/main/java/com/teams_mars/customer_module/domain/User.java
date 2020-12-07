@@ -1,11 +1,11 @@
-package com.teams_mars.demo.customer_module.domain;
+package com.teams_mars.customer_module.domain;
 
-import com.teams_mars.demo.biding_module.domain.PaypalAccount;
-import com.teams_mars.demo.biding_module.domain.WithHeldAmount;
-import com.teams_mars.demo.biding_module.domain.Bid;
-import com.teams_mars.demo._global_domain.License;
-import com.teams_mars.demo.seller_module.domain.Product;
-import com.teams_mars.demo._global_domain.Role;
+import com.teams_mars.biding_module.domain.PaypalAccount;
+import com.teams_mars.biding_module.domain.WithHeldAmount;
+import com.teams_mars.biding_module.domain.Bid;
+import com.teams_mars._global_domain.License;
+import com.teams_mars.seller_module.domain.Product;
+import com.teams_mars._global_domain.Role;
 import lombok.Data;
 
 import javax.persistence.*;

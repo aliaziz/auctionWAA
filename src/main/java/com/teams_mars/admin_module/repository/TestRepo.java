@@ -1,6 +1,6 @@
-package com.teams_mars.demo.admin_module.repository;
+package com.teams_mars.admin_module.repository;
 
-import com.teams_mars.demo._global_domain.Role;
+import com.teams_mars._global_domain.Role;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

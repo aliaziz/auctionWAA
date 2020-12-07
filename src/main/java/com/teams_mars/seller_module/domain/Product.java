@@ -1,9 +1,9 @@
-package com.teams_mars.demo.seller_module.domain;
+package com.teams_mars.seller_module.domain;
 
-import com.teams_mars.demo.admin_module.domain.Category;
-import com.teams_mars.demo.biding_module.domain.Bid;
-import com.teams_mars.demo.biding_module.domain.WithHeldAmount;
-import com.teams_mars.demo.customer_module.domain.User;
+import com.teams_mars.biding_module.domain.WithHeldAmount;
+import com.teams_mars.customer_module.domain.User;
+import com.teams_mars.admin_module.domain.Category;
+import com.teams_mars.biding_module.domain.Bid;
 import lombok.Data;
 
 import javax.persistence.*;

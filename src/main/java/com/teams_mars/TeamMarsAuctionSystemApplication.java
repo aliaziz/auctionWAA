@@ -1,4 +1,4 @@
-package com.teams_mars.demo;
+package com.teams_mars;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

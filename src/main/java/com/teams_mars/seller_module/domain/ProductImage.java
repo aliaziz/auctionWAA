@@ -1,4 +1,4 @@
-package com.teams_mars.demo.seller_module.domain;
+package com.teams_mars.seller_module.domain;
 
 import lombok.Data;
 

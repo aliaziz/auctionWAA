@@ -1,4 +1,4 @@
-package com.teams_mars.demo._global_domain;
+package com.teams_mars._global_domain;
 
 import lombok.Data;
 

@@ -1,6 +1,6 @@
-package com.teams_mars.demo.seller_module.domain;
+package com.teams_mars.seller_module.domain;
 
-import com.teams_mars.demo.customer_module.domain.User;
+import com.teams_mars.customer_module.domain.User;
 import lombok.Data;
 
 import javax.persistence.*;
