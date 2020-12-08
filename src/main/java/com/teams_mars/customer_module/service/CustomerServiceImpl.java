@@ -27,5 +27,4 @@ public class CustomerServiceImpl implements CustomerService {
     public Optional<User> getCustomer(int customerId) {
         return customerRepository.findById(customerId);
     }
-
 }

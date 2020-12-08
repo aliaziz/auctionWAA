@@ -20,4 +20,6 @@ public class WithHeldAmount {
 
     @ManyToOne
     private User customer;
+
+    private double amount;
 }

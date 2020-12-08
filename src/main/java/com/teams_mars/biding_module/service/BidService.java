@@ -11,4 +11,6 @@ public interface BidService {
     List<Bid> getCustomerBidHistory(int customerId);
     List<Bid> getProductBidHistory(int productId);
     double getHighestBidPrice(int productId);
+    boolean makeDeposit(int amount, int customerId, int productId);
+    void test(int productId);
 }

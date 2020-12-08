@@ -18,12 +18,19 @@ public class BidController {
     @ResponseBody
     public String placeBid(@PathVariable int productId, @PathVariable int price) {
         int customerId = 1; //from Session
-        String errorMessage = bidService.placeBid(2, 1, 400);
-        String error2Message = bidService.placeBid(2, 3, 500);
+        bidService.placeBid(2, 1, 400);
+        bidService.placeBid(2, 3, 500);
         String error3Message = bidService.placeBid(2, 4, 600);
 
-        System.out.println("Ending =="+bidService.getCustomerBidHistory(2));
-        System.out.println(bidService.getProductBidHistory(1));
+
+        bidService.placeBid(1, 3, 560);
+        bidService.placeBid(1, 4, 605);
+
+        bidService.placeBid(3, 4, 610);
+        bidService.placeBid(5, 4, 620);
+
+        bidService.test(3);
+        bidService.test(4);
         return "index";
     }
 }

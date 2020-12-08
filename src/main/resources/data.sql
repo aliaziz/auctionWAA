@@ -26,10 +26,10 @@ insert into user VALUES(1, 'aziwa@@gmail.com', 'Lee sensei', true, true, 'abc', 
 insert into user VALUES(2, 'maria@@gmail.com', 'Maria Me', true, true, 'aaa', 1, 2, 1);
 insert into user VALUES(3, 'charles@@gmail.com', 'Maria Me', true, true, 'aaa', 2, 3, 2);
 insert into user VALUES(4, 'habtu@@gmail.com', 'Maria Me', true, true, 'aaa', 1, 4, 2);
-insert into user VALUES(5, 'zhang@@gmail.com', 'Maria Me', true, false, 'aaa', 2, 5, 1);
-insert into user VALUES(6, 'user1@@gmail.com', 'Maria Me', true, false, 'aaa', 1, 6, 1);
-insert into user VALUES(7, 'sensei1@@gmail.com', 'Maria Me', true, false, 'aaa', 1, 7, 2);
-insert into user VALUES(8, 'loggerq@@gmail.com', 'Maria Me', true, false, 'aaa', 2, 8, 2);
+insert into user VALUES(5, 'zhang@@gmail.com', 'Maria Me', true, true, 'aaa', 2, 5, 1);
+insert into user VALUES(6, 'user1@@gmail.com', 'Maria Me', true, true, 'aaa', 1, 6, 1);
+insert into user VALUES(7, 'sensei1@@gmail.com', 'Maria Me', true, true, 'aaa', 1, 7, 2);
+insert into user VALUES(8, 'loggerq@@gmail.com', 'Maria Me', true, true, 'aaa', 2, 8, 2);
 insert into user VALUES(9, 'cable1@@gmail.com', 'Maria Me', true, false, 'aaa', 1, 9, 2);
 insert into user VALUES(10, 'laba1@@gmail.com', 'Maria Me', true, false, 'aaa', 1, 10, 2);
 
