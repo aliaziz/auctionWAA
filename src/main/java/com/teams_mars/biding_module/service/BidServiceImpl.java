@@ -176,6 +176,11 @@ public class BidServiceImpl implements BidService {
         return true;
     }
 
+    @Override
+    public BidWon getInvoice(int customerId, int productId) {
+        return bidWonRepository.findBidWonByProduct_ProductIdAndBidWinner_UserId(productId, customerId);
+    }
+
     /**
      * Charges deposit from the user's payPal account of the  customer.
      * This can happen in 2 scenarios.
@@ -286,11 +291,5 @@ public class BidServiceImpl implements BidService {
     //    @Scheduled(fixedDelay = 120000)
     private void closeBid() {
         //TODO: Get all expired products and close bids.
-    }
-
-    @Override
-    public void test(int productId) {
-        getHighestBidder(productId)
-                .ifPresent(user -> returnAllDeposits(productId, user));
     }
 }

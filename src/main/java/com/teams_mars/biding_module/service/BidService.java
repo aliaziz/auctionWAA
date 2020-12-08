@@ -16,5 +16,5 @@ public interface BidService {
     boolean makeFullPayment(BidWon bidWon);
     boolean paySeller(int productId);
     void productReceived(int productId);
-    void test(int productId);
+    BidWon getInvoice(int customerId, int productId);
 }

@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BidWonRepository extends CrudRepository<BidWon, Integer> {
     BidWon findBidWonByProduct_ProductId(int productId);
+    BidWon findBidWonByProduct_ProductIdAndBidWinner_UserId(int productId, int userId);
 }
