@@ -20,6 +20,9 @@ public class Category {
     @Size(min = 8, max = 50, message = "{Size.name.validation}")
     private String description;
 
-    @OneToMany
+    @ManyToMany
+    @JoinTable(name = "CategoryAndProduct",
+            joinColumns = @JoinColumn(name = "category_id" ),
+            inverseJoinColumns = @JoinColumn(name = "product_id"))
     private List<Product> productList;
 }

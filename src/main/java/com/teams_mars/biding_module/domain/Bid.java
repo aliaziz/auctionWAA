@@ -2,12 +2,17 @@ package com.teams_mars.biding_module.domain;
 
 import com.teams_mars.customer_module.domain.User;
 import com.teams_mars.seller_module.domain.Product;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class Bid {
 
     @Id
@@ -18,7 +23,8 @@ public class Bid {
     private Product product;
 
     @ManyToOne
-    private User customerList;
+    private User customer;
     private double price;
+    private LocalDate bidDate;
 
 }
