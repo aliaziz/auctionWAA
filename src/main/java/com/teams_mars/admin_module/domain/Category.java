@@ -15,5 +15,8 @@ public class Category {
     private String name;
 
     @ManyToMany
+    @JoinTable(name = "CategoryAndProduct",
+            joinColumns = @JoinColumn(name = "category_id" ),
+            inverseJoinColumns = @JoinColumn(name = "product_id"))
     private List<Product> productList;
 }

@@ -1,11 +1,10 @@
 package com.teams_mars.customer_module.domain;
 
-import com.teams_mars.biding_module.domain.PaypalAccount;
-import com.teams_mars.biding_module.domain.WithHeldAmount;
-import com.teams_mars.biding_module.domain.Bid;
 import com.teams_mars._global_domain.License;
-import com.teams_mars.seller_module.domain.Product;
 import com.teams_mars._global_domain.Role;
+import com.teams_mars.biding_module.domain.Bid;
+import com.teams_mars.biding_module.domain.WithHeldAmount;
+import com.teams_mars.seller_module.domain.Product;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -36,10 +35,6 @@ public class User {
 
     @OneToMany(mappedBy = "customer")
     private List<WithHeldAmount> withHeldAmountList;
-
-    @OneToOne
-    @JoinColumn(name = "account_id")
-    private PaypalAccount account;
 
     @OneToMany(mappedBy = "owner")
     private List<Product> productList;

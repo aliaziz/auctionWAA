@@ -18,7 +18,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int product_id;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "productList")
     private List<Category> category;
 
     @OneToMany(mappedBy = "product")
