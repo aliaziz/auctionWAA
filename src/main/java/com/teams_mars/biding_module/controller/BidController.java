@@ -18,8 +18,10 @@ public class BidController {
     @ResponseBody
     public String placeBid(@PathVariable int productId, @PathVariable int price) {
         int customerId = 1; //from Session
-        bidService.placeBid(2, 1, 400);
-        bidService.placeBid(2, 3, 500);
+        bidService.placeBid(2, 1, 30000);
+        bidService.placeBid(2, 1, 30001);
+        bidService.placeBid(2, 1, 30002);
+        bidService.placeBid(2, 1, 30003);
         String error3Message = bidService.placeBid(2, 4, 600);
 
 
@@ -31,6 +33,13 @@ public class BidController {
 
         bidService.test(3);
         bidService.test(4);
+        return "index";
+    }
+
+    @RequestMapping("/deposit/{productId}/{amount}")
+    public String makeDeposit(@PathVariable int productId, @PathVariable int amount) {
+        bidService.makeDeposit(30000, 2, 1);
+
         return "index";
     }
 }

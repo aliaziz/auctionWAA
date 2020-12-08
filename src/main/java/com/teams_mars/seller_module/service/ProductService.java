@@ -8,4 +8,5 @@ import java.util.Optional;
 @Service
 public interface ProductService {
     Optional<Product> getProduct(int productId);
+    void saveProduct(Product product);
 }

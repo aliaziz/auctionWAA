@@ -33,11 +33,11 @@ insert into user VALUES(8, 'loggerq@@gmail.com', 'Maria Me', true, true, 'aaa', 
 insert into user VALUES(9, 'cable1@@gmail.com', 'Maria Me', true, false, 'aaa', 1, 9, 2);
 insert into user VALUES(10, 'laba1@@gmail.com', 'Maria Me', true, false, 'aaa', 1, 10, 2);
 
-insert into paypal_account values ( 1, 1000, 1000, 0, 1);
-insert into paypal_account values ( 2, 400, 400, 0, 2);
-insert into paypal_account values ( 3, 400, 400, 0, 3);
-insert into paypal_account values ( 4, 400, 400, 0, 4);
-insert into paypal_account values ( 5, 400, 400, 0, 5);
+insert into paypal_account values ( 1, 100000, 100000, 0, 1);
+insert into paypal_account values ( 2, 40000, 40000, 0, 2);
+insert into paypal_account values ( 3, 4000, 4000, 0, 3);
+insert into paypal_account values ( 4, 4000, 4000, 0, 4);
+insert into paypal_account values ( 5, 4000, 4000, 0, 5);
 insert into paypal_account values ( 6, 400, 400, 0, 6);
 insert into paypal_account values ( 7, 400, 400, 0, 7);
 insert into paypal_account values ( 8, 400, 400, 0, 8);
