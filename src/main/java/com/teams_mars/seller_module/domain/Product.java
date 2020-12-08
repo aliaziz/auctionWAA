@@ -1,30 +1,32 @@
 package com.teams_mars.seller_module.domain;
 
-import com.teams_mars.biding_module.domain.WithHeldAmount;
-import com.teams_mars.customer_module.domain.User;
 import com.teams_mars.admin_module.domain.Category;
 import com.teams_mars.biding_module.domain.Bid;
-import lombok.Data;
+import com.teams_mars.biding_module.domain.WithHeldAmount;
+import com.teams_mars.customer_module.domain.User;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int product_id;
+    private int productId;
 
     @ManyToMany(mappedBy = "productList")
     private List<Category> category;
 
     @OneToMany(mappedBy = "product")
-    private List<Bid> bid;
+    private List<Bid> bidList;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "productHeld")
     private List<WithHeldAmount> withHeldAmountList;
 
     @OneToMany

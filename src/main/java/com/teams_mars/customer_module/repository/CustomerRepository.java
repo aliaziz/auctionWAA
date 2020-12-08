@@ -10,4 +10,7 @@ public interface CustomerRepository extends CrudRepository<User, Integer> {
 
     @Query("select u.isProfileVerified from User u where u.userId =:customerId")
     boolean isBidEligible(Integer customerId);
+
+    @Query("select p.owner.userId from Product p where p.productId = :productId")
+    Integer isSellerOfProduct(Integer productId);
 }

@@ -17,7 +17,6 @@ public class CustomerController {
     public ModelAndView viewProductDetails(@PathVariable int productId) {
         int customerId = 1;
         boolean bidEligible = customerService.isBidEligible(customerId);
-        System.out.println(bidEligible);
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("productDetails");
         modelAndView.addObject("isEligible", bidEligible);

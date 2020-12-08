@@ -22,10 +22,10 @@ insert into license values ( 10, '2388dfasi889', 'laba1@gmail.com');
 insert into address values (1, 'Fairfield', 'IA', '1000 N', '52557');
 insert into address values (2, 'las vegas', 'CA', '1000 N', '92104');
 
-insert into user VALUES(1, 'aziwa@@gmail.com', 'Lee sensei', true, false, 'abc', 1, 1, 1);
-insert into user VALUES(2, 'maria@@gmail.com', 'Maria Me', true, false, 'aaa', 1, 2, 1);
-insert into user VALUES(3, 'charles@@gmail.com', 'Maria Me', true, false, 'aaa', 2, 3, 2);
-insert into user VALUES(4, 'habtu@@gmail.com', 'Maria Me', true, false, 'aaa', 1, 4, 2);
+insert into user VALUES(1, 'aziwa@@gmail.com', 'Lee sensei', true, true, 'abc', 1, 1, 1);
+insert into user VALUES(2, 'maria@@gmail.com', 'Maria Me', true, true, 'aaa', 1, 2, 1);
+insert into user VALUES(3, 'charles@@gmail.com', 'Maria Me', true, true, 'aaa', 2, 3, 2);
+insert into user VALUES(4, 'habtu@@gmail.com', 'Maria Me', true, true, 'aaa', 1, 4, 2);
 insert into user VALUES(5, 'zhang@@gmail.com', 'Maria Me', true, false, 'aaa', 2, 5, 1);
 insert into user VALUES(6, 'user1@@gmail.com', 'Maria Me', true, false, 'aaa', 1, 6, 1);
 insert into user VALUES(7, 'sensei1@@gmail.com', 'Maria Me', true, false, 'aaa', 1, 7, 2);
