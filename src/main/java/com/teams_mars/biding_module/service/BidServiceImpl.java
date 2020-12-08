@@ -33,21 +33,35 @@ public class BidServiceImpl implements BidService {
 
         User user = customerService.getCustomer(customerId).orElseThrow();
         Product product = productService.getProduct(productId).orElseThrow();
+        boolean isPriceLower = getHighestBidPrice(productId) > price;
+
+        if (isPriceLower) return "Price must be higher than current highest";
+
         Bid bid = new Bid();
         bid.setProduct(product);
         bid.setCustomer(user);
         bid.setPrice(price);
+
         bidRepository.save(bid);
         return "Bid saved";
     }
 
     @Override
     public List<Bid> getCustomerBidHistory(int customerId) {
-        return bidRepository.findAllByCustomer_UserId(customerId);
+        return bidRepository.findAllByCustomer_UserIdOrderByBidDateDesc(customerId);
     }
 
     @Override
     public List<Bid> getProductBidHistory(int productId) {
-        return bidRepository.findAllByProduct_ProductId(productId);
+        return bidRepository.findAllByProduct_ProductIdOrderByBidDate(productId);
+    }
+
+    @Override
+    public double getHighestBidPrice(int productId) {
+       return getProductBidHistory(productId)
+               .stream()
+               .mapToDouble(Bid::getPrice)
+               .max()
+               .orElse(0.0);
     }
 }

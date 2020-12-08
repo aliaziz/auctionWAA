@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface BidRepository extends CrudRepository<Bid, Integer> {
-    List<Bid> findAllByCustomer_UserId(int customerId);
-    List<Bid> findAllByProduct_ProductId(int productId);
+    List<Bid> findAllByCustomer_UserIdOrderByBidDateDesc(int customerId);
+    List<Bid> findAllByProduct_ProductIdOrderByBidDate(int productId);
 }
