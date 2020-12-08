@@ -20,6 +20,9 @@ public class Transaction {
     private User buyer;
 
     @ManyToOne
+    private User seller;
+
+    @ManyToOne
     private Product product;
     private double amount;
     private LocalDate transactionDate;

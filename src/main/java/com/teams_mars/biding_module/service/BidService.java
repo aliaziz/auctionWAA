@@ -14,5 +14,7 @@ public interface BidService {
     double getHighestBidPrice(int productId);
     boolean makeDeposit(double amount, int customerId, int productId);
     boolean makeFullPayment(BidWon bidWon);
+    boolean paySeller(int productId);
+    void productReceived(int productId);
     void test(int productId);
 }

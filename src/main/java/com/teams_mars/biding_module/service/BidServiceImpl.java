@@ -1,13 +1,7 @@
 package com.teams_mars.biding_module.service;
 
-import com.teams_mars.biding_module.domain.Bid;
-import com.teams_mars.biding_module.domain.BidWon;
-import com.teams_mars.biding_module.domain.PaypalAccount;
-import com.teams_mars.biding_module.domain.WithHeldAmount;
-import com.teams_mars.biding_module.repository.BidRepository;
-import com.teams_mars.biding_module.repository.BidWonRepository;
-import com.teams_mars.biding_module.repository.PayPalAccountRepository;
-import com.teams_mars.biding_module.repository.WithHeldRepository;
+import com.teams_mars.biding_module.domain.*;
+import com.teams_mars.biding_module.repository.*;
 import com.teams_mars.customer_module.domain.User;
 import com.teams_mars.customer_module.service.CustomerService;
 import com.teams_mars.seller_module.domain.Product;
@@ -16,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +37,9 @@ public class BidServiceImpl implements BidService {
     @Autowired
     BidWonRepository bidWonRepository;
 
+    @Autowired
+    TransactionRepository transactionRepository;
+
     @Override
     public String placeBid(int customerId, int productId, double price) {
         boolean isEligible = customerService.isBidEligible(customerId);
@@ -64,6 +62,7 @@ public class BidServiceImpl implements BidService {
         bid.setProduct(product);
         bid.setCustomer(user);
         bid.setPrice(price);
+        bid.setBidDate(LocalDate.now());
 
         bidRepository.save(bid);
         return "Bid saved";
@@ -81,11 +80,11 @@ public class BidServiceImpl implements BidService {
 
     @Override
     public double getHighestBidPrice(int productId) {
-       return getProductBidHistory(productId)
-               .stream()
-               .mapToDouble(Bid::getPrice)
-               .max()
-               .orElse(0.0);
+        return getProductBidHistory(productId)
+                .stream()
+                .mapToDouble(Bid::getPrice)
+                .max()
+                .orElse(0.0);
     }
 
     @Override
@@ -118,7 +117,7 @@ public class BidServiceImpl implements BidService {
     @Override
     public boolean makeFullPayment(BidWon bidWon) {
         Product product = bidWon.getProduct();
-        User user = bidWon.getUser();
+        User user = bidWon.getBidWinner();
         PaypalAccount paypalAccount = payPalAccountRepository.findByCustomer_UserId(user.getUserId());
 
 
@@ -141,11 +140,48 @@ public class BidServiceImpl implements BidService {
         return true;
     }
 
+    @Override
+    public void productReceived(int productId) {
+        productService.getProduct(productId)
+                .ifPresent(product -> {
+                    product.setReceived(true);
+                    paySeller(productId);
+                    productService.saveProduct(product);
+                });
+    }
+
+    @Override
+    public boolean paySeller(int productId) {
+        BidWon bidWon = bidWonRepository.findBidWonByProduct_ProductId(productId);
+        double bidFinalPayment = bidWon.getBidFinalAmount();
+        User seller = bidWon.getProduct().getOwner();
+
+        if (bidWon.isSellerPaid()) return false;
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(bidFinalPayment);
+        transaction.setBuyer(bidWon.getBidWinner());
+        transaction.setProduct(bidWon.getProduct());
+        transaction.setSeller(seller);
+        transaction.setTransactionDate(LocalDate.now());
+        transactionRepository.save(transaction);
+
+        PaypalAccount sellerAccount = payPalAccountRepository.findByCustomer_UserId(seller.getUserId());
+        sellerAccount.setAvailableBalance(sellerAccount.getAvailableBalance() + bidFinalPayment);
+        sellerAccount.setTotalBalance(sellerAccount.getTotalBalance() + bidFinalPayment);
+
+        payPalAccountRepository.save(sellerAccount);
+        bidWon.setSellerPaid(true);
+
+        return true;
+    }
+
     /**
      * Charges deposit from the user's payPal account of the  customer.
      * This can happen in 2 scenarios.
      * 1. When making a full payment
      * 2. When the customer hasn't made the full payment and the payment due date has expired.
+     *
      * @param userId
      * @param productId
      */
@@ -158,7 +194,7 @@ public class BidServiceImpl implements BidService {
         double currentWithHeldAmount = paypalAccount.getTotalWithHeldAmount();
         double currentTotalBalance = paypalAccount.getTotalBalance();
 
-        paypalAccount.setTotalWithHeldAmount( currentWithHeldAmount - productDeposit);
+        paypalAccount.setTotalWithHeldAmount(currentWithHeldAmount - productDeposit);
         paypalAccount.setTotalBalance(currentTotalBalance - productDeposit);
 
         payPalAccountRepository.save(paypalAccount);
@@ -166,8 +202,9 @@ public class BidServiceImpl implements BidService {
 
     /**
      * Get's the highest bidder to determine who is winning or has won the bid.
+     *
      * @param productId
-     * @return
+     * @return [Optional<User>]
      */
     private Optional<User> getHighestBidder(int productId) {
         return bidRepository
@@ -180,6 +217,7 @@ public class BidServiceImpl implements BidService {
     /**
      * Saves the winner of the bid to a bidWonRecord object with the user's
      * details, product won details and the amount pending payment.
+     *
      * @param product
      * @param bidWinner
      */
@@ -188,14 +226,16 @@ public class BidServiceImpl implements BidService {
         double remainingBalance = highestBidPrice - product.getDeposit();
         BidWon bidWon = new BidWon();
         bidWon.setProduct(product);
-        bidWon.setUser(bidWinner);
+        bidWon.setBidWinner(bidWinner);
         bidWon.setBidFinalAmount(highestBidPrice);
         bidWon.setBalanceAmount(remainingBalance);
+        bidWon.setDateWon(LocalDate.now());
         bidWonRepository.save(bidWon);
     }
 
     /**
      * Returns all deposits to all user's that lost the bid 💀
+     *
      * @param productId
      * @param bidWinner
      */
@@ -218,6 +258,7 @@ public class BidServiceImpl implements BidService {
 
     /**
      * Returns deposit to user's paypal account from Withheld object.
+     *
      * @param userId
      * @param productId
      */
@@ -242,7 +283,7 @@ public class BidServiceImpl implements BidService {
 
     }
 
-//    @Scheduled(fixedDelay = 120000)
+    //    @Scheduled(fixedDelay = 120000)
     private void closeBid() {
         //TODO: Get all expired products and close bids.
     }
