@@ -10,4 +10,5 @@ public interface CustomerService {
     boolean isBidEligible(int customerId);
     boolean isSeller(int customerId, int productId);
     Optional<User> getCustomer(int customerId);
+
 }
