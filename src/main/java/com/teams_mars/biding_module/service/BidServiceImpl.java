@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -131,6 +132,7 @@ public class BidServiceImpl implements BidService {
         paypalAccount.setTotalBalance(paypalAccount.getTotalBalance() - finalToBePaidAmount);
 
         bidWon.setHasCustomerPaid(true);
+        bidWon.setCustMadePaymentDate(LocalDateTime.now());
         product.setPaymentMade(true);
 
         payPalAccountRepository.save(paypalAccount);
@@ -179,6 +181,26 @@ public class BidServiceImpl implements BidService {
     @Override
     public BidWon getInvoice(int customerId, int productId) {
         return bidWonRepository.findBidWonByProduct_ProductIdAndBidWinner_UserId(productId, customerId);
+    }
+
+    private void returnFullPayment(BidWon bidWon) {
+        int userId = bidWon.getBidWinner().getUserId();
+        double refundableAmount = bidWon.getBidFinalAmount();
+
+        Product product = bidWon.getProduct();
+        PaypalAccount paypalAccount = payPalAccountRepository.findByCustomer_UserId(userId);
+
+        double currentAvailableBalance = paypalAccount.getAvailableBalance();
+        double currentTotalBalance = paypalAccount.getTotalBalance();
+
+        paypalAccount.setAvailableBalance(currentAvailableBalance + refundableAmount);
+        paypalAccount.setTotalBalance(currentTotalBalance + refundableAmount);
+
+        product.setPaymentMade(false);
+
+        payPalAccountRepository.save(paypalAccount);
+        productService.saveProduct(product);
+        bidWonRepository.delete(bidWon);
     }
 
     /**
@@ -234,6 +256,7 @@ public class BidServiceImpl implements BidService {
         bidWon.setBidFinalAmount(highestBidPrice);
         bidWon.setBalanceAmount(remainingBalance);
         bidWon.setDateWon(LocalDateTime.now());
+        bidWon.setPaymentDueDate(product.getBidPaymentDueDate());
         bidWonRepository.save(bidWon);
     }
 
@@ -299,5 +322,35 @@ public class BidServiceImpl implements BidService {
                     getHighestBidder(p.getProductId())
                             .ifPresent(bidWinner -> returnAllDeposits(p.getProductId(), bidWinner));
         });
+    }
+
+    @Scheduled(fixedDelay = 300000, initialDelay = 120000)
+    private void checkIfCustomerPaid() {
+        List<BidWon> bidWonList = new ArrayList<>();
+        bidWonRepository.findAll().forEach(bidWonList::add);
+
+        bidWonList.stream()
+                .filter(bidWon -> !bidWon.isHasCustomerPaid())
+                .filter(bidWon -> LocalDateTime.now().isAfter(bidWon.getPaymentDueDate()))
+                .forEach(bidWon -> {
+                    chargeDeposit(bidWon.getBidWinner().getUserId(), bidWon.getProduct().getProductId());
+                });
+    }
+
+    /**
+     * Scheduler to check if seller has shipped the product yet.
+     * Checks if customer paid, if product is shipped and today's date is higher than 3days since the
+     * customer paid for the product.
+     */
+    @Scheduled(fixedDelay = 300000, initialDelay = 120000)
+    private void checkIfProductShipped() {
+        List<BidWon> bidWonList = new ArrayList<>();
+        bidWonRepository.findAll().forEach(bidWonList::add);
+
+        bidWonList.stream()
+                .filter(BidWon::isHasCustomerPaid)
+                .filter(bidWon -> !bidWon.getProduct().isShipped())
+                .filter(bidWon -> bidWon.getCustMadePaymentDate().plusMinutes(3).isBefore(LocalDateTime.now()))
+                .forEach(this::returnFullPayment);
     }
 }

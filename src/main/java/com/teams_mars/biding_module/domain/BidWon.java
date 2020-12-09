@@ -24,6 +24,8 @@ public class BidWon {
     private boolean hasCustomerPaid;
     private boolean isSellerPaid;
     private LocalDateTime dateWon;
+    private LocalDateTime paymentDueDate;
+    private LocalDateTime custMadePaymentDate;
 
     @ManyToOne
     private User bidWinner;
