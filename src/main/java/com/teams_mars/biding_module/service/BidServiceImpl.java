@@ -8,9 +8,10 @@ import com.teams_mars.seller_module.domain.Product;
 import com.teams_mars.seller_module.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -62,7 +63,7 @@ public class BidServiceImpl implements BidService {
         bid.setProduct(product);
         bid.setCustomer(user);
         bid.setPrice(price);
-        bid.setBidDate(LocalDate.now());
+        bid.setBidDate(LocalDateTime.now());
 
         bidRepository.save(bid);
         return "Bid saved";
@@ -120,7 +121,6 @@ public class BidServiceImpl implements BidService {
         User user = bidWon.getBidWinner();
         PaypalAccount paypalAccount = payPalAccountRepository.findByCustomer_UserId(user.getUserId());
 
-
         double finalToBePaidAmount = bidWon.getBalanceAmount();
         double currentAvailableBalance = paypalAccount.getAvailableBalance();
 
@@ -163,7 +163,7 @@ public class BidServiceImpl implements BidService {
         transaction.setBuyer(bidWon.getBidWinner());
         transaction.setProduct(bidWon.getProduct());
         transaction.setSeller(seller);
-        transaction.setTransactionDate(LocalDate.now());
+        transaction.setTransactionDate(LocalDateTime.now());
         transactionRepository.save(transaction);
 
         PaypalAccount sellerAccount = payPalAccountRepository.findByCustomer_UserId(seller.getUserId());
@@ -190,7 +190,6 @@ public class BidServiceImpl implements BidService {
      * @param userId
      * @param productId
      */
-    //TODO: Add scheduler for charging deposit
     private void chargeDeposit(int userId, int productId) {
         PaypalAccount paypalAccount = payPalAccountRepository.findByCustomer_UserId(userId);
         Product product = productService.getProduct(productId).orElseThrow();
@@ -234,7 +233,7 @@ public class BidServiceImpl implements BidService {
         bidWon.setBidWinner(bidWinner);
         bidWon.setBidFinalAmount(highestBidPrice);
         bidWon.setBalanceAmount(remainingBalance);
-        bidWon.setDateWon(LocalDate.now());
+        bidWon.setDateWon(LocalDateTime.now());
         bidWonRepository.save(bidWon);
     }
 
@@ -254,7 +253,7 @@ public class BidServiceImpl implements BidService {
                 });
 
         bidRepository
-                .findAllByProduct_ProductId(productId)
+                .maximumBidByUser()
                 .stream()
                 .map(Bid::getCustomer)
                 .filter(user -> user.getUserId() != bidWinner.getUserId())
@@ -288,8 +287,17 @@ public class BidServiceImpl implements BidService {
 
     }
 
-    //    @Scheduled(fixedDelay = 120000)
+    @Scheduled(fixedDelay = 120000, initialDelay = 60000)
     private void closeBid() {
-        //TODO: Get all expired products and close bids.
+        productService.getActiveProducts()
+                .stream()
+                .filter(p -> {
+                    LocalDateTime currentDate = LocalDateTime.now();
+                    LocalDateTime dueDate = p.getBidDueDate();
+                    return currentDate.isAfter(dueDate) || currentDate.isEqual(dueDate);
+                }).forEach(p -> {
+                    getHighestBidder(p.getProductId())
+                            .ifPresent(bidWinner -> returnAllDeposits(p.getProductId(), bidWinner));
+        });
     }
 }

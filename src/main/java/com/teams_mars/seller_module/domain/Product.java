@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -38,8 +38,8 @@ public class Product {
     private double deposit;
     private double startingPrice;
     private String description;
-    private LocalDate bidDueDate;
-    private LocalDate bidPaymentDueDate;
+    private LocalDateTime bidDueDate;
+    private LocalDateTime bidPaymentDueDate;
     private boolean isClosed;
     private boolean isPaymentMade;
     private boolean isShipped;

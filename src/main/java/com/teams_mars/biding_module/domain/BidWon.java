@@ -6,13 +6,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
 @Table(
-        uniqueConstraints = @UniqueConstraint(columnNames = "product")
+        uniqueConstraints = @UniqueConstraint(columnNames = "product_product_Id")
 )
 public class BidWon {
     @Id
@@ -23,7 +23,7 @@ public class BidWon {
     private double balanceAmount;
     private boolean hasCustomerPaid;
     private boolean isSellerPaid;
-    private LocalDate dateWon;
+    private LocalDateTime dateWon;
 
     @ManyToOne
     private User bidWinner;

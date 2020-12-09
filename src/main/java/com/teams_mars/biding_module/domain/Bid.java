@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -25,6 +25,11 @@ public class Bid {
     @ManyToOne
     private User customer;
     private double price;
-    private LocalDate bidDate;
+    private LocalDateTime bidDate;
 
+    public Bid(double price, Product product, User customer) {
+        this.price = price;
+        this.product = product;
+        this.customer = customer;
+    }
 }
