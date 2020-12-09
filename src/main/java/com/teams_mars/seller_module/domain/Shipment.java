@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -21,7 +21,7 @@ public class Shipment {
     @OneToOne
     private Product product;
 
-    private LocalDate day;
+    private LocalDateTime day;
     private boolean isShipped;
     private boolean isReceived;
 }

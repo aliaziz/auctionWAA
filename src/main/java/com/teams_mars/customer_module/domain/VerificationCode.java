@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -19,6 +19,6 @@ public class VerificationCode {
     private int verificationCodeId;
     private String email;
     private String code;
-    private LocalDate creationTime;
+    private LocalDateTime creationTime;
 
 }

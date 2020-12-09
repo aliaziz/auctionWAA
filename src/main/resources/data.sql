@@ -33,11 +33,11 @@ insert into user VALUES(8, 'loggerq@@gmail.com', 'Maria Me', true, true, 'aaa', 
 insert into user VALUES(9, 'cable1@@gmail.com', 'Maria Me', true, false, 'aaa', 1, 9, 2);
 insert into user VALUES(10, 'laba1@@gmail.com', 'Maria Me', true, false, 'aaa', 1, 10, 2);
 
-insert into paypal_account values ( 1, 1000, 1000, 0, 1);
-insert into paypal_account values ( 2, 400, 400, 0, 2);
-insert into paypal_account values ( 3, 400, 400, 0, 3);
-insert into paypal_account values ( 4, 400, 400, 0, 4);
-insert into paypal_account values ( 5, 400, 400, 0, 5);
+insert into paypal_account values ( 1, 100000, 100000, 0, 1);
+insert into paypal_account values ( 2, 40000, 40000, 0, 2);
+insert into paypal_account values ( 3, 4000, 4000, 0, 3);
+insert into paypal_account values ( 4, 4000, 4000, 0, 4);
+insert into paypal_account values ( 5, 4000, 4000, 0, 5);
 insert into paypal_account values ( 6, 400, 400, 0, 6);
 insert into paypal_account values ( 7, 400, 400, 0, 7);
 insert into paypal_account values ( 8, 400, 400, 0, 8);
@@ -46,7 +46,7 @@ insert into paypal_account values ( 10, 400, 400, 0, 10);
 
 insert into product values (1,    to_date('07-12-20','dd-mm-yy')    ,to_date('17-12-20','dd-mm-yy'),    30000    ,'A',    'N',    'N',    'N',    'N',    300000,    1);
 insert into product values (2,    to_date('08-12-20','dd-mm-yy')    ,to_date('18-12-20','dd-mm-yy'),    30000    ,'B',    'N',    'N',    'N',    'N',    300000,    2);
-insert into product values (3,    to_date('09-12-20','dd-mm-yy')    ,to_date('19-12-20','dd-mm-yy'),    30000    ,'C',    'N',    'N',    'N',    'N',    300000,    5);
+insert into product values (3,    to_date('07-12-20','dd-mm-yy')    ,to_date('19-12-20','dd-mm-yy'),    30000    ,'C',    'N',    'N',    'N',    'N',    300000,    5);
 insert into product values (4,    to_date('10-12-20','dd-mm-yy')    ,to_date('20-12-20','dd-mm-yy'),    30000    ,'D',    'N',    'N',    'N',    'N',    300000,    6);
 insert into product values (5,    to_date('11-12-20','dd-mm-yy')    ,to_date('21-12-20','dd-mm-yy'),    30000    ,'E',    'N',    'N',    'N',    'N',    300000,    1);
 insert into product values (6,    to_date('12-12-20','dd-mm-yy')    ,to_date('22-12-20','dd-mm-yy'),    30000    ,'F',    'N',    'N',    'N',    'N',    300000,    2);
