@@ -11,19 +11,23 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @Setter
-public class Transaction {
+@Table(
+        uniqueConstraints = @UniqueConstraint(columnNames = "product")
+)
+public class BidWon {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer transactionId;
+    private Integer bidWonId;
+
+    private double bidFinalAmount;
+    private double balanceAmount;
+    private boolean hasCustomerPaid;
+    private boolean isSellerPaid;
+    private LocalDate dateWon;
 
     @ManyToOne
-    private User buyer;
+    private User bidWinner;
 
-    @ManyToOne
-    private User seller;
-
-    @ManyToOne
+    @OneToOne
     private Product product;
-    private double amount;
-    private LocalDate transactionDate;
 }
