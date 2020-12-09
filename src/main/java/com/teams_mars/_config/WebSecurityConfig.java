@@ -28,6 +28,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests().antMatchers("/**").permitAll();
         http.authorizeRequests().antMatchers("/product/**")
                 .hasRole("USER").antMatchers("/**").permitAll().and().formLogin();
         http.csrf().disable();

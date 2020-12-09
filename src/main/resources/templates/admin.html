@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h1>Admin Menu </h1>
+
+<!--
+<label>Create product category - cannot be duplicated</label>
+<label>Update product category</label>
+<label>Delete Product category, cannot delete when has products in this category</label>
+<label>List all product category</label>-->
+<a th:href="@{/category_show}">Categories Menu</a>
+
+<br>
+<!--
+•	Verify Customers & Sellers : The Administrator verifies new users when the online auctioning
+also approve authorized seller/customer after registration.
+•	You can choose to connect to DMV datasource API, or fake checking
+-->
+
+<!--use session to save admin information, when logout, close the session-->
+<a>Admin Logout</a>
+<br>
+<!--grap data from data base, save the user information in the data base-->
+<a>List all users need to be verified</a>
+<br>
+<!--edit user,give the user power-->
+<a>Approve user - must have verification process, your own API is fine</a>
+<br>
+
+<input th:href="@{/logout}" type="submit" value="Logout">
+
+</body>
+</html>
