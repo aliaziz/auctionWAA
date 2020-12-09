@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Update Category</h1><!--如果返回带Id的object，后台用更新，如果没有id，后台用save-->
+<form th:action="@{/category_update}" th:object="${category}" method="post">
+    <p style="color: red" th:text="${msg}" th:if="${not #strings.isEmpty(msg)}"></p>
+
+    <input type="hidden" th:field="*{category_id}" ></input>
+
+    <label>Name</label>
+    <input th:field="*{name}" type="text" />
+    <p style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+    <br/>
+    <br>
+    <span>Description</span>
+    <input type="text" th:field="*{description}">
+    <p style="color: red" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></p>
+    <br>
+
+
+    <!-- <input type="submit" th:value="${'*{category_id}' eq null}? 'ADD':'UPDATE'"></input>-->
+    <input type="submit" value="UPDATE">
+
+</form>
+</body>
+</html>

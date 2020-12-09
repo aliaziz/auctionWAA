@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Login</h1>
+
+<form th:action="@{/admin}" th:object="${user}" method="post">
+    <p style="color: red" th:text="${msg}" th:if="${not #strings.isEmpty(msg)}"></p>
+
+    <label >User name</label>
+    <input th:field= "*{userName}" type="text"  placeholder="username" />
+    <p style="color: red" th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}" ></p>
+    <br/>
+
+    <label>Password</label>
+    <input type="text" th:field= "*{passWord}"placeholder="password">
+    <p style="color: red" th:if="${#fields.hasErrors('passWord')}" th:errors="*{passWord}" ></p>
+    <br/>
+    <input type="submit" value="Login">
+</form>
+
+
+<!--<a href="/admin">login</a>
+<a th:href="@{/admin}">go to admin</a>-->
+
+</body>
+</html>

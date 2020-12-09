@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script type="text/javascript" th:src="@{/js/category.js}"></script>
+</head>
+<body>
+<h1>Add Category</h1>
+
+<div id="result">
+
+<form th:id ="categoryAddForm" th:action="@{/category_save}" th:object="${category}" method="post">
+    <p style="color: red" th:text="${msg}" th:if="${not #strings.isEmpty(msg)}"></p>
+
+   <!-- <input type="hidden" th:if="${'*{category_id}'}" ? name="_method"  th:value="PUT"></input>-->
+
+    <label>Name</label>
+    <input th:field="*{name}" type="text" />
+    <p style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+    <br/>
+    <br>
+    <span>Description</span>
+    <input type="text" th:field="*{description}">
+    <p style="color: red" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></p>
+    <br>
+
+
+   <!-- <input type="submit" th:value="${'*{category_id}' eq null}? 'ADD':'UPDATE'"></input>-->
+    <input th:id="categorySubmitBtn" type="submit" value="ADD">
+
+</form>
+</body>
+</html>

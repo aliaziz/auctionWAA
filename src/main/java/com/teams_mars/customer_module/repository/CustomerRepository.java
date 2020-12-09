@@ -13,4 +13,5 @@ public interface CustomerRepository extends CrudRepository<User, Integer> {
 
     @Query("select p.owner.userId from Product p where p.productId = :productId")
     Integer isSellerOfProduct(Integer productId);
+
 }
