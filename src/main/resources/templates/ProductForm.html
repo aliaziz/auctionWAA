@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Form</title>
+    <link href="css/main.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/main.css}" href="../css/main.css">
+</head>
+<body>
+<div id="global">
+    <form action="#" th:action="@{/product_save}" th:object="${product}" method="post" enctype="multipart/form-data">
+        <fieldset>
+            <legend>
+                <span th:text="#{form.title}">Add a Product</span>
+            </legend>
+            <ul th:if="${#fields.hasErrors('*')}">
+                <li th:each="err: ${#fields.errors()}" th:text="${err}">Input is incorrect</li>
+            </ul>
+            <p>
+                <label for="images"><span th:text="#{form.images}">Product Images:  </span></label>
+                <input type="file" th:field="*{multipartFiles}" multiple/>
+            <p th:if="${#fields.hasErrors('multipartFiles')}" th:errors="*{multipartFiles}" th:errorclass="fieldError">Missing Description</p>
+            </p>
+            <p>
+                <label for="description"><span th:text="#{form.description}">Product Description:  </span></label>
+                <input type="text" th:field="*{description}" />
+            <p th:if="${#fields.hasErrors('description')}" th:errors="*{description}" th:errorclass="fieldError">Missing Description</p>
+            </p>
+            <p>
+                <label for="startingPrice"><span th:text="#{form.startingPrice}">Starting Bid: </span></label>
+                <input type="text" th:field="*{startingPrice}" />
+            <p th:if="${#fields.hasErrors('startingPrice')}" th:errors="*{startingPrice}" th:errorclass="fieldError">Missing Starting Bid Price</p>
+            </p>
+            <p>
+                <label for="deposit"><span th:text="#{form.deposit}">Allowed Initial Deposit: </span></label>
+                <input type="text" th:field="*{deposit}" />
+            <p th:if="${#fields.hasErrors('deposit')}" th:errors="*{deposit}" th:errorclass="fieldError">Input expected Initial Deposit</p>
+            </p>
+            <p>
+                <label for="bidDueDate"><span th:text="#{form.bidDueDate}">Bid Closing Time:  </span></label>
+                <input type="text" th:field="*{bidDueDate}" />
+            <p th:if="${#fields.hasErrors('bidDueDate')}" th:errors="*{bidDueDate}" th:errorclass="fieldError">Enter a correct date</p>
+            </p>
+            <p>
+                <label for="bidPaymentDueDate"><span th:text="#{form.bidPaymentDueDate}">Bid Payment Deadline:  </span></label>
+                <input type="text" th:field="*{bidPaymentDueDate}" />
+            <p th:if="${#fields.hasErrors('description')}" th:errors="*{bidPaymentDueDate}" th:errorclass="fieldError">Enter correct Bid Payment Deadline Date:</p>
+            </p>
+            <p id="buttons">
+                <input id="save" type="submit" th:value="#{form.savebtn}" value="Save Product" tabindex="4">
+                <input id="add" type="submit" tabindex="5" th:value="#{form.addbtn}" value="Add Product">
+            </p>
+        </fieldset>
+    </form>
+</div>
+</body>
+</html>
