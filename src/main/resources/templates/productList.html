@@ -6,6 +6,18 @@
     <script th:src="@{/static/js/jquery-min.js}"></script>
 </head>
 <body>
+<p>The product</p>
+<div th:object="${pgProductList}">
 
+    <ul th:each="product:${pgProductList}">
+        <li th:text ="${product.description}"></li>
+
+
+    </ul>
+    <a th:href="@{/products/1/startingPrice/{asc}(asc=true)}">1</a>
+    <a th:href="@{/products/2/startingPrice/{asc}(asc=true)}">2</a>
+
+
+</div>
 </body>
 </html>
