@@ -1,13 +1,13 @@
 package com.teams_mars.biding_module.controller;
 
+import com.teams_mars.biding_module.domain.Bid;
 import com.teams_mars.biding_module.service.BidService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/bid")
@@ -42,6 +42,12 @@ public class BidController {
         bidService.makeDeposit(30000, 1, 3);
 
         return "index";
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/get/{productId}", method = RequestMethod.GET)
+    public List<Bid> getBids(@PathVariable int productId) {
+        return bidService.getProductBidHistory(productId);
     }
 
     @InitBinder

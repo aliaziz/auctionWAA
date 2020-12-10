@@ -1,5 +1,6 @@
 package com.teams_mars.biding_module.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.teams_mars.customer_module.domain.User;
 import com.teams_mars.seller_module.domain.Product;
 import lombok.Getter;
@@ -20,9 +21,11 @@ public class Bid {
     private Integer bidId;
 
     @ManyToOne
+    @JsonIgnore
     private Product product;
 
     @ManyToOne
+    @JsonIgnore
     private User customer;
     private double price;
     private LocalDateTime bidDate;

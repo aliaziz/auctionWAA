@@ -3,21 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Product list</title>
-    <script th:src="@{/static/js/jquery-min.js}"></script>
+    <script th:src="@{/js/jquery-min.js}" type="text/javascript"></script>
+    <script th:src="@{/js/product.js}" type="text/javascript"></script>
 </head>
 <body>
 <p>The product</p>
-<div th:object="${pgProductList}">
-
-    <ul th:each="product:${pgProductList}">
-        <li th:text ="${product.description}"></li>
-
-
-    </ul>
-    <a th:href="@{/products/1/startingPrice/{asc}(asc=true)}">1</a>
-    <a th:href="@{/products/2/startingPrice/{asc}(asc=true)}">2</a>
-
-
+<div th:each="product : ${pgProductList}">
+    <span th:text ="${product.description}"></span>
+    <button th:onclick="|getProductBids(${product.productId})|">Get product bids</button>
 </div>
+<a th:href="@{/products/1/startingPrice/{asc}(asc=true)}">1</a>
+<a th:href="@{/products/2/startingPrice/{asc}(asc=true)}">2</a>
 </body>
 </html>

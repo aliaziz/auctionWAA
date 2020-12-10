@@ -47,7 +47,7 @@ public class ProductServiceImpl implements ProductService {
         Sort sort = Sort.by(attr).descending();
         if (!isDesc) sort.ascending();
 
-        Pageable pageable = PageRequest.of(pageNum, 2, sort);
+        Pageable pageable = PageRequest.of(pageNum, 10, sort);
         Page<Product> productList = productRepository.findAll(pageable);
         return productList.toList();
 
