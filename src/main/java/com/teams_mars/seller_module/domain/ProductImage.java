@@ -13,6 +13,6 @@ public class ProductImage {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer productImageId;
     private String imagePath;
-    @OneToOne
-    private Product product;
+//    @OneToOne
+//    private Product product;
 }

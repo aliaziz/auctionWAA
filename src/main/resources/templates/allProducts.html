@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:object="${product}">
+    <a href="#" th:href="@{/product/{uproductId}}">
+        <p th:text="*{productId}">ID: 0</p>
+        <p th:text="*{description}">Description: </p>
+        <p th:text="*{deposit}">Initial Deposit: </p>
+        <p th:text="*{startingPrice}">Starting Bid Price: </p>
+        <p th:text="*{bidPaymentDueDate}">Bid Payment Due Date: </p>
+        <p th:text="*{bidDueDate}">Bid Due Date: </p>
+        <p th:text="*{imagePath}">Image Path: </p>
+
+    </a>
+</div>
+
+</body>
+</html>

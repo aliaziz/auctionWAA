@@ -6,6 +6,7 @@ import com.teams_mars.biding_module.domain.WithHeldAmount;
 import com.teams_mars.customer_module.domain.User;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -29,8 +30,8 @@ public class Product {
     @OneToMany(mappedBy = "productHeld")
     private List<WithHeldAmount> withHeldAmountList;
 
-    @OneToMany
-    private List<ProductImage> imagePaths;
+//    @OneToMany
+//    private List<ProductImage> imagePaths;
 
     @ManyToOne
     private User owner;
@@ -44,4 +45,10 @@ public class Product {
     private boolean isPaymentMade;
     private boolean isShipped;
     private boolean isReceived;
+    private String imagePath;
+
+    @Transient
+    private MultipartFile[] multipartFiles;
+    @Transient
+    private String Name;
 }

@@ -31,8 +31,7 @@ public class BidController {
         bidService.placeBid(3, 4, 610);
         bidService.placeBid(5, 4, 620);
 
-        bidService.test(3);
-        bidService.test(4);
+
         return "index";
     }
 

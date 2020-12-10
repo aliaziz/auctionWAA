@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Table(
-        uniqueConstraints = @UniqueConstraint(columnNames = "product")
+        uniqueConstraints = @UniqueConstraint(columnNames = "product_product_Id")
 )
 public class BidWon {
     @Id
