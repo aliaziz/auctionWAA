@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Show Category Information</h1>
+
+<!--只有form有pojo,这里只能用el取-->
+<table>
+    <p style="color: red" th:text="${msg}" th:if="${not #strings.isEmpty(msg)}"></p>
+    <tr>
+        <th>Category ID</th>
+        <th>Category Name</th>
+        <th>Description</th>
+        <th>ProductList</th>
+        <th>OPTION(<a th:href="@{/category_add}">ADD</a> )</th>
+
+    </tr>
+    <tr th:each="category : ${categories}">
+        <td th:text="${category.category_id}">category_id</td>
+        <td th:text="${category.name}">name</td>
+        <td th:text="${category.description}">description</td>
+        <td ><a th:href="@{/category_showProductList/{categoryid}(categoryid=${category.category_id})}">ProductList</a></td>
+        <td>
+        <!--重点练习-->
+        <a th:href="@{/category_update/{categoryid}(categoryid=${category.category_id})}">UPDATE</a>
+        <a th:href="@{/category_delete/{categoryid}(categoryid=${category.category_id})}">DELETE</a>
+        </td>
+
+    </tr>
+
+</table>
+</body>
+</html>
+
+
+</body>
+</html>
