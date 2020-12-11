@@ -16,5 +16,7 @@ public interface BidService {
     boolean makeFullPayment(BidWon bidWon);
     boolean paySeller(int productId);
     void productReceived(int productId);
+    double getDepositAmount(int productId);
+    double getBidBalanceAmount(int productId);
     BidWon getInvoice(int customerId, int productId);
 }

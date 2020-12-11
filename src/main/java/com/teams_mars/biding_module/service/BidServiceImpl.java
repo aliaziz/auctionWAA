@@ -42,6 +42,9 @@ public class BidServiceImpl implements BidService {
     @Autowired
     TransactionRepository transactionRepository;
 
+    @Autowired
+    PayPalService payPalService;
+
     @Override
     public String placeBid(int customerId, int productId, double price) {
         boolean isEligible = customerService.isBidEligible(customerId);
@@ -57,8 +60,9 @@ public class BidServiceImpl implements BidService {
         User user = customerService.getCustomer(customerId).orElseThrow();
         Product product = productService.getProduct(productId).orElseThrow();
         boolean isPriceLower = getHighestBidPrice(productId) > price;
+        boolean isPriceLowerThanStartPrice = product.getStartingPrice() > price;
 
-        if (isPriceLower) return "Price must be higher than current highest";
+        if (isPriceLower && isPriceLowerThanStartPrice) return "Price must be higher than current highest";
 
         Bid bid = new Bid();
         bid.setProduct(product);
@@ -183,24 +187,40 @@ public class BidServiceImpl implements BidService {
         return bidWonRepository.findBidWonByProduct_ProductIdAndBidWinner_UserId(productId, customerId);
     }
 
+    @Override
+    public double getDepositAmount(int productId) {
+        return productService.getProduct(productId).orElseThrow().getDeposit();
+    }
+
+    @Override
+    public double getBidBalanceAmount(int bidId) {
+        return bidWonRepository.findById(bidId).orElseThrow().getBalanceAmount();
+    }
+
     private void returnFullPayment(BidWon bidWon) {
         int userId = bidWon.getBidWinner().getUserId();
+        int productId = bidWon.getProduct().getProductId();
         double refundableAmount = bidWon.getBidFinalAmount();
 
-        Product product = bidWon.getProduct();
-        PaypalAccount paypalAccount = payPalAccountRepository.findByCustomer_UserId(userId);
+        boolean depositRefunded = payPalService.refundPayment(userId, productId, PaymentEnumType.DEPOSIT.name());
+        boolean balanceRefunded = payPalService.refundPayment(userId, productId, PaymentEnumType.FULL_PAYMENT.name());
+        if (depositRefunded && balanceRefunded) {
 
-        double currentAvailableBalance = paypalAccount.getAvailableBalance();
-        double currentTotalBalance = paypalAccount.getTotalBalance();
+            Product product = bidWon.getProduct();
+            PaypalAccount paypalAccount = payPalAccountRepository.findByCustomer_UserId(userId);
 
-        paypalAccount.setAvailableBalance(currentAvailableBalance + refundableAmount);
-        paypalAccount.setTotalBalance(currentTotalBalance + refundableAmount);
+            double currentAvailableBalance = paypalAccount.getAvailableBalance();
+            double currentTotalBalance = paypalAccount.getTotalBalance();
 
-        product.setPaymentMade(false);
+            paypalAccount.setAvailableBalance(currentAvailableBalance + refundableAmount);
+            paypalAccount.setTotalBalance(currentTotalBalance + refundableAmount);
 
-        payPalAccountRepository.save(paypalAccount);
-        productService.saveProduct(product);
-        bidWonRepository.delete(bidWon);
+            product.setPaymentMade(false);
+
+            payPalAccountRepository.save(paypalAccount);
+            productService.saveProduct(product);
+            bidWonRepository.delete(bidWon);
+        } else throw new RuntimeException("Failed to refund deposit or balance amount.");
     }
 
     /**
@@ -290,24 +310,26 @@ public class BidServiceImpl implements BidService {
      * @param productId
      */
     private void returnDeposit(int userId, int productId) {
-        WithHeldAmount withHeldAmountObj = withHeldRepository
-                .findByCustomer_UserIdAndProductHeld_ProductId(userId, productId)
-                .orElseThrow();
+        boolean payPalRefunded = payPalService.refundPayment(userId, productId, PaymentEnumType.DEPOSIT.name());
+        if (payPalRefunded) {
+            WithHeldAmount withHeldAmountObj = withHeldRepository
+                    .findByCustomer_UserIdAndProductHeld_ProductId(userId, productId)
+                    .orElseThrow();
 
-        PaypalAccount paypalAccount = payPalAccountRepository
-                .findByCustomer_UserId(userId);
+            PaypalAccount paypalAccount = payPalAccountRepository
+                    .findByCustomer_UserId(userId);
 
-        double withHeldAmount = withHeldAmountObj.getAmount();
-        double paypalWithHeldAmount = paypalAccount.getTotalWithHeldAmount();
-        double currentPaypalWithHeldAmount = paypalWithHeldAmount - withHeldAmount;
-        double currentPaypalAvailableBalance = paypalAccount.getAvailableBalance() + withHeldAmount;
+            double withHeldAmount = withHeldAmountObj.getAmount();
+            double paypalWithHeldAmount = paypalAccount.getTotalWithHeldAmount();
+            double currentPaypalWithHeldAmount = paypalWithHeldAmount - withHeldAmount;
+            double currentPaypalAvailableBalance = paypalAccount.getAvailableBalance() + withHeldAmount;
 
-        withHeldRepository.delete(withHeldAmountObj);
+            withHeldRepository.delete(withHeldAmountObj);
 
-        paypalAccount.setTotalWithHeldAmount(currentPaypalWithHeldAmount);
-        paypalAccount.setAvailableBalance(currentPaypalAvailableBalance);
-        payPalAccountRepository.save(paypalAccount);
-
+            paypalAccount.setTotalWithHeldAmount(currentPaypalWithHeldAmount);
+            paypalAccount.setAvailableBalance(currentPaypalAvailableBalance);
+            payPalAccountRepository.save(paypalAccount);
+        } else throw new RuntimeException("Failed to refund paypal deposit.");
     }
 
     @Scheduled(fixedDelay = 120000, initialDelay = 60000)
