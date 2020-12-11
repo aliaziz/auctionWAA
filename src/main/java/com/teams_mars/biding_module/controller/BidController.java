@@ -132,11 +132,11 @@ public class BidController {
         return bidService.getProductBidHistory(productId);
     }
 
+    @ResponseBody
     @GetMapping(PayPalService.CANCEL_URL)
-    public String handleCancel() {
-        return "error";
+    public boolean handleCancel() {
+        return false;
     }
-
 
     @InitBinder
     public void Bind(WebDataBinder binder) {

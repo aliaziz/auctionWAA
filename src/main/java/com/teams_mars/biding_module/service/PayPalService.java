@@ -104,7 +104,6 @@ public class PayPalService {
     public void transferToSeller() {
     }
 
-
     public void savePaypalTransaction(String saleId, int productId,
                                       Integer userId, String paymentId,
                                       String payerId, PaymentEnumType enumType, double amount) {
