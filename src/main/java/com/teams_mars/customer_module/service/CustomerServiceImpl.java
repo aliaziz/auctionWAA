@@ -40,4 +40,9 @@ public class CustomerServiceImpl implements CustomerService {
     public List<Product> viewPagedProductList(int pageNum, String attr, boolean isDesc) {
         return productService.getAllProductsByPage(pageNum, attr, isDesc);
     }
+
+    @Override
+    public List<Product> searchPagedProducts(int pageNum, String keyword) {
+        return productService.searchProductsByName(pageNum, keyword);
+    }
 }

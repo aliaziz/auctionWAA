@@ -1,7 +1,6 @@
 package com.teams_mars.seller_module.controller;
 
 import com.teams_mars.seller_module.domain.Product;
-import com.teams_mars.seller_module.domain.ProductImage;
 import com.teams_mars.seller_module.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,14 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Controller
 public class SellerController {
@@ -27,7 +22,7 @@ public class SellerController {
     ProductRepository productRepository;
 
     public static String uploadFolder = System.getProperty("user.dir")+"/uploads";
-//    File file = new File(uploadFolder);
+
     @GetMapping("/product_add")
     public String inputProduct(@ModelAttribute("product") Product product){
         return "ProductForm";
@@ -70,10 +65,5 @@ public class SellerController {
     public String editProduct(){
         return "0";
     }
-
-//    @InitBinder
-//    public void Binder(WebDataBinder binder) {
-//        binder.setDisallowedFields("multipartFile");
-//    }
 
 }

@@ -14,4 +14,5 @@ public interface CustomerService {
     boolean isSeller(int customerId, int productId);
     Optional<User> getCustomer(int customerId);
     List<Product> viewPagedProductList(int pageNum, String attr, boolean isDesc);
+    List<Product> searchPagedProducts(int pageNum, String keyword);
 }

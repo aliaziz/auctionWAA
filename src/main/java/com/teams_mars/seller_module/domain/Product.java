@@ -30,9 +30,6 @@ public class Product {
     @OneToMany(mappedBy = "productHeld")
     private List<WithHeldAmount> withHeldAmountList;
 
-//    @OneToMany
-//    private List<ProductImage> imagePaths;
-
     @ManyToOne
     private User owner;
 

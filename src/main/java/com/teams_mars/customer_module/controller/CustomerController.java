@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -28,11 +29,18 @@ public class CustomerController {
         return modelAndView;
     }
 
+    @ResponseBody
     @RequestMapping("/{pageNum}/{attr}/{isDesc}")
-    public String viewProductLists(@PathVariable int pageNum,
-                                   @PathVariable String attr,@PathVariable Boolean isDesc, Model model) {
-       List<Product> productList = customerService.viewPagedProductList(pageNum,attr,isDesc);
-            model.addAttribute("pgProductList",productList);
-        return "productList";
+    public List<Product> viewProductLists(@PathVariable int pageNum,
+                                   @PathVariable String attr,@PathVariable Boolean isDesc) {
+
+        return customerService.viewPagedProductList(pageNum,attr,isDesc);
+    }
+
+    @ResponseBody
+    @RequestMapping("/search/{pageNum}/{search}")
+    public List<Product> searchProducts(@PathVariable int pageNum,
+                                 @PathVariable String search) {
+        return customerService.searchPagedProducts(pageNum, search);
     }
 }

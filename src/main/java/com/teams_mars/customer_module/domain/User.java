@@ -1,5 +1,6 @@
 package com.teams_mars.customer_module.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.teams_mars._global_domain.License;
 import com.teams_mars.admin_module.domain.Role;
 import com.teams_mars.biding_module.domain.Bid;
@@ -39,6 +40,7 @@ public class User {
     private List<WithHeldAmount> withHeldAmountList;
 
     @OneToMany(mappedBy = "owner")
+    @JsonIgnore
     private List<Product> productList;
 
     @OneToOne
