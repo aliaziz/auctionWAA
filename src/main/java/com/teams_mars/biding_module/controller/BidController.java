@@ -93,6 +93,7 @@ public class BidController {
         Integer userId = (Integer) model.getAttribute("userId");
 
         Payment payment = payPalService.executePayment(paymentId, payerId);
+        System.out.println(payment.toJSON());
         if (payment.getState().equals("approved")) {
             PaymentEnumType enumType = PaymentEnumType.valueOf(paymentType);
 
