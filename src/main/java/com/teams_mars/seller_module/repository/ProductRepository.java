@@ -12,8 +12,14 @@ public interface ProductRepository extends PagingAndSortingRepository<Product,In
 
     @Query("select p from Product p where p.isClosed = false")
     List<Product> getActiveProducts();
-
+    //@Query("select p.owner.userId from Product p where p.productId = :productId")
+    //Integer isSellerOfProduct(Integer productId);
+    //List<Product> findProductByName(String name);
+    List<Product> findProductByCategory(String category);
 
     Page<Product> findAllByDescription(String keyWord, Pageable pageable);
 //    Page<Product> findAllByDescription(Pageable pageable);
+
+
+
 }

@@ -12,7 +12,10 @@ public interface ProductService {
     void saveProduct(Product product);
     List<Product> getAllProducts();
     List<Product> getActiveProducts();
+    List<Product> findProductByCategory(String category);
+
     List<Product> getAllProductsByPage(int pageNum, String attr, boolean isDesc);
     List<Product> searchProductsByName(int pageNum, String keyWord);
     List<String> getProductImages(int productId);
+
 }

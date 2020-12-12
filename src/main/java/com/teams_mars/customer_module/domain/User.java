@@ -8,6 +8,7 @@ import com.teams_mars.biding_module.domain.WithHeldAmount;
 import com.teams_mars.seller_module.domain.Product;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@ToString
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 public class User {
 
@@ -30,6 +32,18 @@ public class User {
     private String fullName;
 
     @OneToOne
+    private Address address;
+
+    private boolean isProfileVerified;
+    private boolean isCodeVerified = false;
+
+
+    public User(int userId) {
+        this.userId = userId;
+    }
+    public User() {    }
+
+    @OneToOne
     @JoinColumn(name = "license_id")
     private License license;
 
@@ -43,9 +57,11 @@ public class User {
     @JsonIgnore
     private List<Product> productList;
 
-    @OneToOne
-    private Address address;
+    public boolean isProfileVerified() {
+        return isProfileVerified;
+    }
 
-    private boolean isProfileVerified;
-    private boolean isCodeVerified = false;
+    public void setProfileVerified(boolean profileVerified) {
+        isProfileVerified = profileVerified;
+    }
 }

@@ -23,17 +23,11 @@ also approve authorized seller/customer after registration.
 •	You can choose to connect to DMV datasource API, or fake checking
 -->
 
-<!--use session to save admin information, when logout, close the session-->
-<a>Admin Logout</a>
+<a th:href="@{/show_user}">User information</a>
 <br>
-<!--grap data from data base, save the user information in the data base-->
-<a>List all users need to be verified</a>
-<br>
-<!--edit user,give the user power-->
-<a>Approve user - must have verification process, your own API is fine</a>
-<br>
+<a  th:href="${'/logout'}">Logout</a>
 
-<input th:href="@{/logout}" type="submit" value="Logout">
+<a th:href="@{/infinite_scroll}">infinite_scroll</a>
 
 </body>
 </html>

@@ -2,7 +2,6 @@ package com.teams_mars.biding_module.controller;
 
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.PayPalRESTException;
-import com.teams_mars.biding_module.domain.Bid;
 import com.teams_mars.biding_module.domain.BidWon;
 import com.teams_mars.biding_module.domain.PaymentEnumType;
 import com.teams_mars.biding_module.repository.BidWonRepository;
@@ -16,8 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/bid")
@@ -50,7 +47,9 @@ public class BidController {
         double amount = bidService.getDepositAmount(productId);
         Payment payment = payPalService.createPayment(amount, productId, PaymentEnumType.DEPOSIT);
         for (Links link : payment.getLinks()) {
-            if (link.getRel().equals("approval_url")) return "redirect:" + link.getHref();
+            if (link.getRel().equals("approval_url")) {
+                return "redirect:" + link.getHref();
+            }
         }
 
         return "index";
@@ -77,6 +76,7 @@ public class BidController {
 
         model.addAttribute("userId", 1);
         Integer userId = (Integer) model.getAttribute("userId");
+
 
         Payment payment = payPalService.executePayment(paymentId, payerId);
         System.out.println(payment.toJSON());

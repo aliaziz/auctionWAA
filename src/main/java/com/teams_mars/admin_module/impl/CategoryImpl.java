@@ -2,6 +2,7 @@ package com.teams_mars.admin_module.impl;
 
 import com.teams_mars.admin_module.domain.Category;
 import com.teams_mars.admin_module.repository.CategoryRepository;
+import com.teams_mars.seller_module.domain.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,11 @@ public class CategoryImpl implements CategoryService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<Product>  findProductsByCategoryId2(Long categoryId) {
+        return categoryRepository.findProductsByCategoryId2(categoryId);
     }
 
 }

@@ -75,4 +75,12 @@ public class ProductServiceImpl implements ProductService {
 
         return imagePathsList;
     }
+
+    @Override
+    public List<Product> findProductByCategory(String category) {
+        List<Product> productByName = productRepository.findProductByCategory(category);
+        return productByName;
+    }
+
+
 }
