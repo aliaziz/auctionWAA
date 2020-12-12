@@ -27,6 +27,17 @@ The above copyright notice and this permission notice shall be included in all c
         <nav th:replace="fragment/inner_nav :: inner-nav"></nav>
         <div class="section text-center">
             <div class="features">
+                <div class="alert alert-success">
+                    <div class="container">
+                        <div class="alert-icon">
+                            <i class="material-icons">check</i>
+                        </div>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true"><i class="material-icons">clear</i></span>
+                        </button>
+                        <b th:text="${msg}">Success Alert:</b> Yuhuuu! You&apos;ve got your $11.99 album from The Weeknd
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-lg-4 col-md-4 col-sm-6" th:each="product: ${productList}">
                         <div class="fh5co-card-item">
