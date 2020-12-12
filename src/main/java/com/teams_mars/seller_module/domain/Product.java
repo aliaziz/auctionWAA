@@ -1,5 +1,6 @@
 package com.teams_mars.seller_module.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.teams_mars.admin_module.domain.Category;
 import com.teams_mars.biding_module.domain.Bid;
 import com.teams_mars.biding_module.domain.WithHeldAmount;
@@ -25,6 +26,7 @@ public class Product {
     private List<Category> category;
 
     @OneToMany(mappedBy = "product")
+    @JsonBackReference
     private List<Bid> bidList;
 
     @OneToMany(mappedBy = "productHeld")

@@ -1,5 +1,6 @@
 package com.teams_mars.customer_module.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.teams_mars._global_domain.License;
 import com.teams_mars.admin_module.domain.Role;
@@ -34,6 +35,7 @@ public class User {
     private License license;
 
     @OneToMany(mappedBy = "customer")
+    @JsonBackReference
     private List<Bid> bidList;
 
     @OneToMany(mappedBy = "customer")

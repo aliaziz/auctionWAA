@@ -202,6 +202,11 @@ public class BidServiceImpl implements BidService {
         return bidWonRepository.findById(bidId).orElseThrow().getBalanceAmount();
     }
 
+    @Override
+    public List<BidWon> getCustomerBidsWon(int customerId) {
+        return bidWonRepository.findAllByBidWinner_UserId(customerId);
+    }
+
     private void returnFullPayment(BidWon bidWon) {
         int userId = bidWon.getBidWinner().getUserId();
         int productId = bidWon.getProduct().getProductId();

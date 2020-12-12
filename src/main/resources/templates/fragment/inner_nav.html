@@ -2,9 +2,10 @@
     <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="btn-group" role="group">
+            <button type="button" class="btn btn-secondary"><a th:href="@{/products}">Home</a></button>
             <button th:if="${isSeller}" type="button" class="btn btn-secondary">View My Products</button>
-            <button type="button" class="btn btn-secondary">Bids won</button>
-            <button type="button" class="btn btn-secondary">Bid history</button>
+            <button type="button" class="btn btn-secondary"><a th:href="@{/customer/bidsWon}">Bids won</a></button>
+            <button type="button" class="btn btn-secondary"><a th:href="@{/customer/bidHistory}">Bid history</a></button>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse">
@@ -23,7 +24,7 @@
                         <a class="dropdown-item" href="#">Jewelry</a>
                     </div>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" th:if="${isSeller}">
                     <a href="../product_form.html" class="btn btn-success btn-raised btn-fab btn-round">
                         <i class="material-icons">add</i>
                     </a>

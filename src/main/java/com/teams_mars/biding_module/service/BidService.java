@@ -20,4 +20,5 @@ public interface BidService {
     double getBidBalanceAmount(int productId);
     boolean hasMadeDeposit(int customerId, int productId);
     BidWon getInvoice(int customerId, int productId);
+    List<BidWon> getCustomerBidsWon(int customerId);
 }
