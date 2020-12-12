@@ -22,7 +22,7 @@ public class CustomerServiceImpl implements CustomerService {
     ProductService productService;
 
     @Override
-    public boolean isBidEligible(int customerId) {
+    public boolean isCustomerVerified(int customerId) {
         return customerRepository.isBidEligible(customerId);
     }
 

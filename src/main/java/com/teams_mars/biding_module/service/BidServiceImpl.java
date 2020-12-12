@@ -47,20 +47,18 @@ public class BidServiceImpl implements BidService {
 
     @Override
     public String placeBid(int customerId, int productId, double price) {
-        boolean isEligible = customerService.isBidEligible(customerId);
+        boolean customerVerified = customerService.isCustomerVerified(customerId);
         boolean isSeller = customerService.isSeller(customerId, productId);
-        boolean hasMadeDeposit = withHeldRepository
-                .findByCustomer_UserIdAndProductHeld_ProductId(customerId, productId)
-                .isPresent();
+        boolean hasMadeDeposit = hasMadeDeposit(customerId, productId);
 
-        if (!isEligible) return "Not eligible, please get account verified.";
+        if (!customerVerified) return "Not eligible, please get account verified.";
         if (isSeller) return "Seller can't bid on own product";
         if (!hasMadeDeposit) return "Customer must make deposit first";
 
         User user = customerService.getCustomer(customerId).orElseThrow();
         Product product = productService.getProduct(productId).orElseThrow();
-        boolean isPriceLower = getHighestBidPrice(productId) > price;
-        boolean isPriceLowerThanStartPrice = product.getStartingPrice() > price;
+        boolean isPriceLower = getHighestBidPrice(productId) >= price;
+        boolean isPriceLowerThanStartPrice = product.getStartingPrice() >= price;
 
         if (isPriceLower && isPriceLowerThanStartPrice) return "Price must be higher than current highest";
 
@@ -72,6 +70,13 @@ public class BidServiceImpl implements BidService {
 
         bidRepository.save(bid);
         return "Bid saved";
+    }
+
+    @Override
+    public boolean hasMadeDeposit(int customerId, int productId) {
+        return withHeldRepository
+                .findByCustomer_UserIdAndProductHeld_ProductId(customerId, productId)
+                .isPresent();
     }
 
     @Override

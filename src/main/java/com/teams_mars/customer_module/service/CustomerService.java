@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Service
 public interface CustomerService {
-    boolean isBidEligible(int customerId);
+    boolean isCustomerVerified(int customerId);
     boolean isSeller(int customerId, int productId);
     Optional<User> getCustomer(int customerId);
     List<Product> viewPagedProductList(int pageNum, String attr, boolean isDesc);

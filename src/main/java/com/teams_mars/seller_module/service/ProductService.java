@@ -14,4 +14,5 @@ public interface ProductService {
     List<Product> getActiveProducts();
     List<Product> getAllProductsByPage(int pageNum, String attr, boolean isDesc);
     List<Product> searchProductsByName(int pageNum, String keyWord);
+    List<String> getProductImages(int productId);
 }

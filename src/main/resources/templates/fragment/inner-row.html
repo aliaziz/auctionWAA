@@ -1,10 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+
+<div class="row" th:fragment="inner-row">
+    <div class="span12">
+        <form class="navbar-form ml-auto" style="margin-top:50px;" method="get" action="/products/search">
+            <div class="input-group no-border">
+                <input type="text" name="query" value="" class="form-control" style="width: 900px; margin-left: 150px"
+                       placeholder="Search products..">
+                <button type="submit" class="btn btn-primary btn-round btn-just-icon">
+                    <i class="material-icons">search</i>
+                    <div class="ripple-container"></div>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

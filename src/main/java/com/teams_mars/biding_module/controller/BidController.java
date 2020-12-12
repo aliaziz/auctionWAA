@@ -40,22 +40,9 @@ public class BidController {
 
     @RequestMapping("/place/{productId}/{price}")
     @ResponseBody
-    public String placeBid(@PathVariable int productId, @PathVariable int price) {
+    public String placeBid(@PathVariable int productId, @PathVariable double price) {
         int customerId = 1; //from Session
-        bidService.placeBid(2, 3, 30000);
-        bidService.placeBid(2, 3, 30001);
-        bidService.placeBid(2, 3, 30002);
-        bidService.placeBid(2, 3, 30003);
-        String error3Message = bidService.placeBid(2, 4, 600);
-
-
-        bidService.placeBid(1, 3, 30004);
-        bidService.placeBid(1, 3, 30005);
-
-        bidService.placeBid(1, 3, 30006);
-        bidService.placeBid(1, 3, 30007);
-
-        return "index";
+        return bidService.placeBid(customerId, productId, price);
     }
 
     @RequestMapping("/deposit/{productId}")
@@ -81,15 +68,14 @@ public class BidController {
         return "index";
     }
 
-    @ResponseBody
     @GetMapping(PayPalService.SUCCESS_URL + "/{paymentType}/{productId}")
-    public boolean handleSuccess(@PathVariable int productId,
+    public String handleSuccess(@PathVariable int productId,
                                  @PathVariable String paymentType,
                                  @RequestParam String paymentId,
                                  @RequestParam("PayerID") String payerId,
                                  Model model) throws PayPalRESTException {
 
-        model.addAttribute("userId", 2);
+        model.addAttribute("userId", 1);
         Integer userId = (Integer) model.getAttribute("userId");
 
         Payment payment = payPalService.executePayment(paymentId, payerId);
@@ -108,29 +94,26 @@ public class BidController {
             switch (enumType) {
                 case DEPOSIT: {
                     Product product = productService.getProduct(productId).orElseThrow();
-                    return bidService.makeDeposit(product.getDeposit(), userId, productId);
+                    bidService.makeDeposit(product.getDeposit(), userId, productId);
+                    break;
                 }
                 case FULL_PAYMENT: {
                     BidWon bidWon = bidWonRepository.findBidWonByProduct_ProductId(productId);
-                    return bidService.makeFullPayment(bidWon);
+                    bidService.makeFullPayment(bidWon);
+                    break;
                 }
                 default:
                     break;
             }
         }
 
-        return false;
+        return "redirect:/products/"+productId;
     }
 
-    @GetMapping("/refund")
-    public String handleRefund() {
-        return "success";
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "/get/{productId}", method = RequestMethod.GET)
-    public List<Bid> getBids(@PathVariable int productId) {
-        return bidService.getProductBidHistory(productId);
+    @RequestMapping(value = "/bidHistory/{productId}", method = RequestMethod.GET)
+    public String getBids(@PathVariable int productId, Model model) {
+        model.addAttribute("bidHistory", bidService.getProductBidHistory(productId));
+        return "product/bid_history";
     }
 
     @ResponseBody
