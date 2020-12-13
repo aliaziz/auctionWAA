@@ -63,7 +63,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> searchProductsByName(int pageNum, String keyWord) {
         Pageable pageable = PageRequest.of(pageNum,3);
-        Page<Product> productList = productRepository.findAllByDescription(keyWord, pageable);
+        Page<Product> productList = productRepository.findAllByNameIsLike(keyWord, pageable);
         return productList.toList();
     }
 
