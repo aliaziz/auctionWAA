@@ -1,6 +1,7 @@
 package com.teams_mars.seller_module.controller;
 
 import com.teams_mars.admin_module.domain.Category;
+import com.teams_mars.admin_module.impl.CategoryService;
 import com.teams_mars.seller_module.domain.Product;
 import com.teams_mars.seller_module.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ public class ProductController {
     @Autowired
     ProductService productService;
 
+    @Autowired
+    CategoryService categoryService;
+
     public static String uploadFolder = System.getProperty("user.dir")+"/uploads";
 //    File file = new File(uploadFolder);
 
@@ -38,8 +42,10 @@ public class ProductController {
     }
 
     @GetMapping("/product/add")
-    public String inputProduct(@ModelAttribute("product") Product product){
-
+    public String inputProduct(@ModelAttribute("product") Product product, Model model){
+        List<Category> category = categoryService.findAll();
+        model.addAttribute("product", product);
+        model.addAttribute("category", category);
         return "product/product_form";
     }
 
@@ -96,18 +102,20 @@ public class ProductController {
         return "product/seller_product_details";
     }
 
-    @GetMapping("/product/update/{product_id}")
-    public String updateProductForm(@PathVariable int product_id){
+    @GetMapping("/product/update/{productId}")
+    public String updateProductForm(@PathVariable int productId, Model model){
+        Product product = productService.getProduct(productId).orElseThrow();
+        model.addAttribute("product", product);
+        return "product/updateProduct_form";
+    }
+
+    @PostMapping("/product/update/{productId}")
+    public String updateProduct(@PathVariable int productId){
         return "0";
     }
 
-    @PostMapping("/product/update/{product_id}")
-    public String updateProduct(@PathVariable int product_id){
-        return "0";
-    }
-
-    @PostMapping("/product/delete/{product_id}")
-    public String deleteProduct(@PathVariable int product_id){
+    @PostMapping("/product/delete/{productId}")
+    public String deleteProduct(@PathVariable int productId){
         return "0";
     }
 
