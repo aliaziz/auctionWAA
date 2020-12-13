@@ -18,6 +18,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -84,11 +85,11 @@ public class RegistrationController {
 
     @GetMapping("/verifyAccount")
     public String verify(@RequestParam("verificationNumber") String verificationNumber,
-                         @RequestParam("userId") String userId, Model model) {
+                         @RequestParam("userId") int userId, Model model, HttpSession session) {
 
-        Boolean doesExist = verificationService.verifyCode(verificationNumber, userId);
-        User user = userService.getUserById(Integer.parseInt(userId));
-        int countTries= verificationService.getVerificationUsingUser(Integer.parseInt(userId)).getCountTries();
+        Boolean doesExist = verificationService.verifyCode(verificationNumber, String.valueOf(userId));
+        User user = userService.getUserById(userId);
+        int countTries= verificationService.getVerificationUsingUser(userId).getCountTries();
 
         if (doesExist) {
             if (verificationService.isVerificationCodeExpired(user)) {
@@ -98,9 +99,10 @@ public class RegistrationController {
             }
             verificationService.updateVerificationCount(0, user);
 
+            session.setAttribute("userId", userId);
             String authority =  user.getUserRole().getRole();
             autWithAuthManager(user.getEmail(),user.getPassword(),authority);
-            return "redirect:/";
+            return "redirect:/products/";
         } else {
             countTries++;
             verificationService.updateVerificationCount(countTries, user);
@@ -127,7 +129,7 @@ public class RegistrationController {
 
     }
 
-    public void autWithAuthManager(String username,String password,String authority){
+    public static void autWithAuthManager(String username,String password,String authority){
         Authentication authentication = new UsernamePasswordAuthenticationToken(username,password, AuthorityUtils.createAuthorityList(authority));
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }

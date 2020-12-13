@@ -6,6 +6,8 @@ import com.teams_mars.customer_module.service.CustomerService;
 import com.teams_mars.seller_module.domain.Product;
 import com.teams_mars.seller_module.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -38,12 +40,12 @@ public class ProductsController {
     @Autowired
     private ServletContext servletContext;
 
-    private final String uploadFolder = System.getProperty("user.dir")+"/uploads";
-
+    private final String uploadFolder = System.getProperty("user.dir") + "/uploads";
 
     @RequestMapping("/{productId}")
-    public String viewProductDetails(@PathVariable int productId, Model model) {
-        int customerId = 1;
+    public String viewProductDetails(@PathVariable int productId,
+                                     Model model) {
+        int customerId = (int) model.getAttribute("userId");
         boolean isVerified = customerService.isCustomerVerified(customerId);
         boolean hasMadeDeposit = bidService.hasMadeDeposit(customerId, productId);
         Product product = productService.getProduct(productId).orElseThrow();
@@ -58,21 +60,20 @@ public class ProductsController {
     @RequestMapping(value = {"/", "/home"})
     public String showProductLists(Model model) {
 
-        List<Product> productList = customerService.viewPagedProductList(0,"startingPrice",false);
-        model.addAttribute("isSeller", true);
+        List<Product> productList = customerService.viewPagedProductList(0, "startingPrice", false);
+        model.addAttribute("isSeller", isSeller());
         model.addAttribute("productList", productList);
         model.addAttribute("isDesc", false);
-        model.addAttribute("seller", "6");
         return "product/product_list";
     }
 
     @RequestMapping("/{pageNum}/{attr}/{isDesc}")
     public String showPagedProductLists(@PathVariable int pageNum,
-                                          @PathVariable String attr,
-                                          @PathVariable Boolean isDesc,
-                                          Model model) {
+                                        @PathVariable String attr,
+                                        @PathVariable Boolean isDesc,
+                                        Model model) {
 
-        List<Product> productList = customerService.viewPagedProductList(pageNum,attr,isDesc);
+        List<Product> productList = customerService.viewPagedProductList(pageNum, attr, isDesc);
         model.addAttribute("isDesc", isDesc);
         model.addAttribute("productList", productList);
         return "product/product_list";
@@ -94,7 +95,7 @@ public class ProductsController {
     }
 
     @GetMapping("/add")
-    public String inputProduct(@ModelAttribute("product") Product product){
+    public String inputProduct(@ModelAttribute("product") Product product) {
         return "product/product_form";
     }
 
@@ -102,24 +103,23 @@ public class ProductsController {
     public String saveProduct(@Valid @ModelAttribute("product") Product product, BindingResult bindingResult,
                               RedirectAttributes redirectAttributes) throws IOException {
         System.out.println(product);
-        if (bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             return "product/product_form";
         }
         Path path = Paths.get(uploadFolder, product.getName());
         try {
             Files.createDirectory(path);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             System.out.print("Directory exists, we will just proceed " +
                     "to add in pics tho this is not the desired functionality");
         }
         String[] suppressedFields = bindingResult.getSuppressedFields();
-        if (suppressedFields.length > 0){
+        if (suppressedFields.length > 0) {
             throw new RuntimeException("Attempt to bind fields that haven't been allowed " +
                     "in initBinder(): " + StringUtils.addStringToArray(suppressedFields, ", "));
         }
         //save product
-        for (MultipartFile file: product.getMultipartFiles()){
+        for (MultipartFile file : product.getMultipartFiles()) {
             Path fileNameAndPath = Paths.get(path.toString(), file.getOriginalFilename());
             Files.write(fileNameAndPath, file.getBytes());
         }
@@ -130,18 +130,18 @@ public class ProductsController {
     }
 
     @GetMapping("/myProducts")
-    public String myProducts(Model model){
-        List<Product> productList = productService.getAllSellerProducts(6);
+    public String myProducts(Model model) {
+        List<Product> productList = productService.getAllSellerProducts((int) model.getAttribute("userId"));
         model.addAttribute("productList", productList);
         return "product/seller_product_list";
     }
 
     @GetMapping("/myProducts/{productId}")
-    public String viewProduct(@PathVariable int productId, Model model){
+    public String viewProduct(@PathVariable int productId, Model model) {
         //query DB for product with ID id
         Product product = productService.getProduct(productId).orElseThrow();
         System.out.println(product.getCategory());
-        for(Category cat:product.getCategory()){
+        for (Category cat : product.getCategory()) {
             System.out.println(cat.getName());
         }
         //add product to model
@@ -150,19 +150,25 @@ public class ProductsController {
     }
 
     @GetMapping("/update/{product_id}")
-    public String updateProductForm(@PathVariable int product_id){
+    public String updateProductForm(@PathVariable int product_id) {
         return "0";
     }
 
     @PostMapping("/update/{product_id}")
-    public String updateProduct(@PathVariable int product_id){
+    public String updateProduct(@PathVariable int product_id) {
         return "0";
     }
 
     @PostMapping("/delete/{product_id}")
-    public String deleteProduct(@PathVariable int product_id){
+    public String deleteProduct(@PathVariable int product_id) {
         return "0";
     }
 
+    private boolean isSeller() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth.getAuthorities()
+                .stream()
+                .anyMatch(role -> role.getAuthority().equals("SELLER"));
+    }
 
 }
