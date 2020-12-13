@@ -40,6 +40,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<Product> getAllSellerProducts(int id) {
+
+        return productRepository.findAllByOwner_UserId(id);
+    }
+
+    @Override
     public List<Product> getActiveProducts() {
         return productRepository.getActiveProducts();
     }
@@ -75,4 +81,12 @@ public class ProductServiceImpl implements ProductService {
 
         return imagePathsList;
     }
+
+    @Override
+    public List<Product> findProductByCategory(String category) {
+        List<Product> productByName = productRepository.findProductByCategory(category);
+        return productByName;
+    }
+
+
 }

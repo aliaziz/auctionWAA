@@ -47,8 +47,14 @@ The above copyright notice and this permission notice shall be included in all c
                             <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
                         </ol>
                         <div class="carousel-inner">
-                            <div class="carousel-item" th:each="image, idx: ${imageList}">
-                                <img class="d-block w-100" style="height: 500px" th:src="@{'/uploads/'+ ${product.name} +'/'+${image}}" th:alt="slide" alt="image">
+                            <div class="carousel-item active">
+                                <img class="d-block w-100"  style="height: 500px" th:href="@{/img/img/bg2.jpg}" src="../static/img/bg2.jpg" alt="First slide">
+                            </div>
+                            <div class="carousel-item">
+                                <img class="d-block w-100" style="height: 500px" th:href="@{/img/img/bg2.jpg}" src="../static/img/cover.jpg" alt="Second slide">
+                            </div>
+                            <div class="carousel-item">
+                                <img class="d-block w-100" style="height: 500px" th:href="@{/img/img/bg2.jpg}" src="../static/img/city.jpg" alt="Third slide">
                             </div>
                         </div>
                         <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
@@ -61,53 +67,48 @@ The above copyright notice and this permission notice shall be included in all c
                         </a>
                     </div>
                 </div>
-                <div class="col-md-6"><h4 class="card-title"><span th:text="*{name}"></span></h4>
+                <div class="col-md-6">
+                    <h3 class="card-title" th:text="*{name}">
+                        iPhone
+                    </h3>
+                    <h4 class="card-title" th:text="*{description}">
+                        Apple iPhone 10S XS Max - 256GB - White/Silver Verizon Factory UNLOCKED MINT
+                    </h4>
                     <hr>
-                    <h6 class="card-subtitle mb-2 text-muted"><span th:text="*{description}"></span></h6>
-                    <h6 class="card-subtitle mb-2 text-muted">Bid due date:  <span th:text="*{bidDueDate}"></span></h6>
+                    Categories :
+                    <h6 class="card-subtitle mb-2 text-muted" th:each="cat:${product.category}">
+                        <b th:text="${cat.name}"></b>
+                    </h6>
+                    <h6 class="card-subtitle mb-2 text-muted" >Has Bids :<b th:text="*{hasBid}">: No</b></h6>
                     <hr>
                     <div class="row">
                         <div class="col-md-6">
-                            <p style="font-size: 30px">
-                                $<span th:text="${highestBidPrice}"></span>
-                            </p>
+                            <p style="font-size: 14px">Bid Due Date:<b th:text="*{bidDueDate}"> Bid Due Date:</b></p>
                         </div>
                         <div class="col-md-6">
-                            <p class="card-text" style="font-size: medium; font-weight: bold">
-                                <a th:href="@{/bid/bidHistory/{productId}(productId = *{productId})}">[<span th:text="*{bidList.size()}"></span> bids]</a>
-                            </p>
+                            <p style="font-size: 14px">Payment Due Date:<b th:text="*{bidPaymentDueDate}"> Payment Due Date:</b></p>
                         </div>
                     </div>
+                    <hr>
                     <div class="row">
-                        <div th:if="${isVerified}">
-                            <div class="col-md-9" th:if="${hasMadeDeposit}">
-                                <div class="input-group no-border">
-                                    <input type="text" id="bidPrice" class="form-control" style="width: 30px; height: 50px; margin-right: 50px; border: 2px solid #999999;" placeholder="Enter bid">
+                        <div class="col-md-6">
+                            <p>Is Product Released :<b th:text="*{isReleased}">Is Product Released:</b></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <a th:href="@{/produt_update}" th:text="#{form.update}" class="btn btn-primary pull-right btn-round">Update</a>
+                        <a th:href="@{/produt_delete}"  th:text="#{form.delete}" class="btn btn-primary pull-right btn-round">Delete</a>
 
-                                    <button id="placeBidButton" th:onclick="|placeBid(*{productId})|" class="btn btn-primary btn-just-icon" style="width: 200px; height: 46px">
-                                        <h4 class="card-title" style="color: white; padding-bottom: 10px">Place bid</h4>
-                                    </button>
-                                    <p><b>Enter US $</b><span th:text="${highestBidPrice}" style="font-weight: bold"></span> <b> or more</b></p>
-                                </div>
-                                <div id="status-area" class="col-md-8"></div>
-                            </div>
-                            <button th:if="${not hasMadeDeposit}" class="btn btn-primary btn-just-icon" style="width: 200px; height: 46px">
-                                <h4 class="card-title" style="color: white; padding-bottom: 10px">
-                                    <a th:href="@{/bid/deposit/{productId}(productId= *{productId})}">Make Deposit</a>
-                                </h4>
-                            </button>
-                        </div>
-                        <p class="alert-warning alert" th:if="${not isVerified}">To be eligible for bidding, please verify your account.</p>
+                        <div class="clearfix"></div>
+<!--                        <div class="col-md-2">-->
+<!--                            <p><b>Delivery:</b></p>-->
+<!--                        </div>-->
+<!--                        <div class="col-md-10">-->
+<!--                            <p>Estimated on or before<b>Thu. Dec. 24</b>  to 52556</p>-->
+<!--                        </div>-->
                     </div>
                     <hr>
-                    <div class="row">
-                        <div class="col-md-2">
-                            <p><b>Shipping:</b></p>
-                        </div>
-                        <div class="col-md-10">
-                            <p><b>Free</b> Expedited Shipping </p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

@@ -1,0 +1,135 @@
+<!--
+=========================================================
+Material Kit - v2.0.7
+=========================================================
+
+Product Page: https://www.creative-tim.com/product/material-kit
+Copyright 2020 Creative Tim (https://www.creative-tim.com/)
+
+Coded by Creative Tim
+
+=========================================================
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head th:replace="fragment/head :: head"></head>
+
+<body class="profile-page sidebar-collapse">
+<nav th:replace="fragment/nav :: nav"></nav>
+<div class="page-header header-filter" data-parallax="true" th:style="'background-image: url(/img/city-profile.jpg); height:200px;'"
+     style="background-image: url('../../static/img/city-profile.jpg'); height:200px; "></div>
+
+<div class="main main-raised">
+    <div class="container">
+        <div th:replace="fragment/inner-row :: inner-row"></div>
+        <nav th:replace="fragment/inner_nav :: inner-nav"></nav>
+        <br>
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title" th:text="#{form.title}">Add a Product</h4>
+                <p class="card-category">Complete the product form</p>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/products/save}" th:object="${product}" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="bmd-label-floating" th:text="#{form.images}">Product Images:</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="file"  th:field="*{multipartFiles}" multiple />
+                            <p th:if="${#fields.hasErrors('multipartFiles')}" th:errors="*{multipartFiles}" th:errorclass="error"></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating" th:text="#{form.name}">Product Name</label>
+                                <input type="text" class="form-control" th:field="*{name}">
+                                <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" th:errorclass="error"></p>
+                                <!--                <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" th:errorclass="error"></p>-->
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating" th:text="#{form.description}">Product Description:</label>
+                                <input type="text" class="form-control" th:field="*{description}">
+                                <p th:if="${#fields.hasErrors('description')}" th:errors="*{description}" th:errorclass="error"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating" th:text="#{form.startingPrice}">Starting Bid:</label>
+                                <input type="text" class="form-control" th:field="*{startingPrice}">
+                                <p th:if="${#fields.hasErrors('startingPrice')}" th:errors="*{startingPrice}" th:errorclass="error"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating" th:text="#{form.deposit}">Allowed Initial Deposit</label>
+                                <input type="text" class="form-control" th:field="*{deposit}">
+                                <p th:if="${#fields.hasErrors('deposit')}" th:errors="*{deposit}" th:errorclass="error"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label  th:text="#{form.bidDueDate}">Bid Closing Time:</label>
+                                <input type="datetime-local" class="form-control" th:field="*{bidDueDate}">
+                                <p th:if="${#fields.hasErrors('bidDueDate')}" th:errors="*{bidDueDate}" th:errorclass="error"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label th:text="#{form.bidPaymentDueDate}">Bid Payment Deadline:</label>
+                                <input type="datetime-local" class="form-control" th:field="*{bidPaymentDueDate}">
+                                <p th:if="${#fields.hasErrors('bidPaymentDueDate')}" th:errors="*{bidPaymentDueDate}" th:errorclass="error"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating" th:text="#{form.category}"></label>
+                                <select class="form-control">
+                                    <option value="default" style="color: #8e8a8a">Choose category </option>
+                                    <option value="phones">Phones</option>
+                                    <option value="jewelry">Jewelry</option>
+                                    <option value="watches">Watches</option>
+                                    <option value="shoes">Shoes</option>
+                                    <option value="Jackets">Jackets</option>
+                                    <option value="appliances">Appliances</option>
+                                    <option value="cosmetics">Cosmetics</option>
+                                    <option value="books">Books</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="togglebutton">
+                            <label style="color: #1a1a1a; font-size: 16px">
+                                Turn Switch to Release Product :
+                                <input type="checkbox" value="0">
+                                <span class="toggle"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" th:value="#{form.addbtn}" class="btn btn-primary pull-right btn-round">Create Product</button>
+                    <div class="clearfix"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<footer th:replace="fragment/footer :: footer"></footer>
+</body>
+
+</html>

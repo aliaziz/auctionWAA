@@ -21,9 +21,10 @@
     </tr>
     <tr th:each="category : ${categories}">
         <td th:text="${category.category_id}">category_id</td>
-        <td th:text="${category.name}">name</td>
+        <!--th:text 替换a标签中显示的字，th:href把这个字变成超链接，td标签没有东西，无论是静态或动态-->
+        <td ><a th:text="${category.name}" th:href="@{/category_showProductList/{categoryId}(categoryId=${category.category_id})}"></a></td>
         <td th:text="${category.description}">description</td>
-        <td ><a th:href="@{/category_showProductList/{categoryid}(categoryid=${category.category_id})}">ProductList</a></td>
+        <td ><a th:href="@{/category_showProductList/{categoryid}(categoryid=${category.category_id})}"></a></td>
         <td>
         <!--重点练习-->
         <a th:href="@{/category_update/{categoryid}(categoryid=${category.category_id})}">UPDATE</a>
@@ -33,6 +34,9 @@
     </tr>
 
 </table>
+
+
+<!--<a th:href="@{/category_product_infinitescroll/{categoryid}(categoryid=${category.category_id})}">Test</a>-->
 </body>
 </html>
 

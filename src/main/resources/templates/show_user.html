@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>User Information</h1>
+
+
+<table>
+    <p style="color: red" th:text="${msg}" th:if="${not #strings.isEmpty(msg)}"></p>
+    <tr>
+        <th>User ID</th>
+        <th>User Role</th>
+        <th>User Email</th>
+        <th>User FullName</th>
+        <th>Status</th>
+        <th>Active User</th>
+    </tr>
+    <tr th:each="user : ${allUsersVerify}">
+        <td th:text="${user.userId}"></td>
+        <td th:text="${user.role}"></td>
+        <td th:text="${user.email}"></td>
+        <td th:text="${user.fullName}"></td>
+        <td th:text="${user.profileVerified}"></td><!--当用is给boolean的变量命名时，会没有get方法，所以用el拿不到值-->
+        <td><a th:href="@{/activeUser/{userId}(userId=${user.userId})}">Active User</a></td>
+    </tr>
+</table>
+</body>
+</html>
