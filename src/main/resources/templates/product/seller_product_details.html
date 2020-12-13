@@ -97,8 +97,8 @@ The above copyright notice and this permission notice shall be included in all c
                     </div>
                     <hr>
                     <div class="row">
-                        <a th:href="@{/produt_update}" th:text="#{form.update}" class="btn btn-primary pull-right btn-round">Update</a>
-                        <a th:href="@{/produt_delete}"  th:text="#{form.delete}" class="btn btn-primary pull-right btn-round">Delete</a>
+                        <a th:href="@{/product/update/{productId}(productId=${product.productId})}" th:text="#{form.update}" class="btn btn-primary pull-right btn-round">Update</a>
+                        <a th:href="@{/produt/delete}"  th:text="#{form.delete}" class="btn btn-primary pull-right btn-round">Delete</a>
 
                         <div class="clearfix"></div>
 <!--                        <div class="col-md-2">-->
