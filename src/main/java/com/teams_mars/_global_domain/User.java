@@ -70,8 +70,6 @@ public class User {
 
     @Column(name = "isVerified")
     private boolean verificationCodeVerified;
-
-
     @OneToOne()
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Role userRole;
