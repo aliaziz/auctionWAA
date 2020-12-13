@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:https="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Verification Page</title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" ></script>
+    <script type="text/javascript" th:src="@{/js/main.js}"></script>
+</head>
+<body>
+
+<h1>Thank You Registred Succesfully ..........</h1>
+<h2>Verification Page.........</h2>
+<h2 style="color: #FF1C19">We sent you a code to your email to verify its you !!!</h2>
+
+<form method="get" action="/verifyAccount" >
+<p>Enter your Verifcation code Here : <input type="text" id="verify " name="verificationNumber">
+    <input type="hidden" name="userId" th:value="${unverifiedUser.userId}" >
+<button type="submit">Verify</button></p>
+    <div >
+        <p style="color: red" th:text="${message}"></p>
+    </div>
+
+    <!-- We will use ajax and on success it will display him a congratulation and a link to the login page -->
+</form>
+
+<button id="resendButtton"  type="submit" th:data="${unverifiedUser.userId}"> Resend Code</button>
+
+</body>
+</html>

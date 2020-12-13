@@ -1,8 +1,6 @@
 package com.teams_mars.customer_module.domain;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,21 +11,20 @@ import javax.validation.constraints.Size;
 
 @Data
 @Entity
-public class Address {
+public class ResetPassword {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     @NotBlank
-    @Size(min = 5, max = 20)
-    private String street;
+    @Size(min = 6,max = 8)
+    private String newPassword;
 
     @NotBlank
-    private String city;
-    @NotBlank
-    @Size(min = 2, max = 2)
-    private String state;
-    @NotBlank
-    private String zipcode;
+    @Size(min=6,max = 10)
+    private String confirmPassword;
+
+    private int userId;
+
 }

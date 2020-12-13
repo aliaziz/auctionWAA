@@ -1,6 +1,6 @@
 package com.teams_mars.biding_module.domain;
 
-import com.teams_mars.customer_module.domain.User;
+import com.teams_mars._global_domain.User;
 import com.teams_mars.seller_module.domain.Product;
 import lombok.Getter;
 import lombok.Setter;
