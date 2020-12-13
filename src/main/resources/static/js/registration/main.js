@@ -20,6 +20,7 @@ $(document).ready(function (){
 
     $("#sendPassword").click(function (event){
        event.preventDefault();
+       console.log("in js");
        var emailAddress = document.getElementById("resetPass").value
 
         $.ajax({
