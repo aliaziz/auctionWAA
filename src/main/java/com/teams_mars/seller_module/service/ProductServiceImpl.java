@@ -40,6 +40,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<Product> getAllSellerProducts(int id) {
+
+        return productRepository.findAllByOwner_UserId(id);
+    }
+
+    @Override
     public List<Product> getActiveProducts() {
         return productRepository.getActiveProducts();
     }

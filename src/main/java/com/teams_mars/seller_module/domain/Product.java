@@ -75,6 +75,9 @@ public class Product {
     private boolean isShipped;
     private boolean isReceived;
     private String imagePath;
+    private Integer imageCount;
+    private boolean isReleased;
+    private boolean hasBid;
 
     @Transient
 //    @NotBlank
