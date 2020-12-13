@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.teams_mars.admin_module.domain.Category;
 import com.teams_mars.biding_module.domain.Bid;
 import com.teams_mars.biding_module.domain.WithHeldAmount;
-import com.teams_mars.customer_module.domain.User;
+import com.teams_mars._global_domain.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
