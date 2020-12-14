@@ -61,7 +61,7 @@ public class ProductController {
     @RequestMapping(value = {"/", "/home"})
     public String showProductLists(Model model) {
 
-        List<Product> productList = customerService.viewPagedProductList(0, "startingPrice", false);
+        List<Product> productList = productService.getAllProductsByPage(0, "startingPrice", false);
         model.addAttribute("isSeller", isSeller());
         model.addAttribute("productList", productList);
         model.addAttribute("isDesc", false);
@@ -74,7 +74,7 @@ public class ProductController {
                                         @PathVariable Boolean isDesc,
                                         Model model) {
 
-        List<Product> productList = customerService.viewPagedProductList(pageNum, attr, isDesc);
+        List<Product> productList = productService.getAllProductsByPage(pageNum, attr, isDesc);
         model.addAttribute("isDesc", isDesc);
         model.addAttribute("productList", productList);
         return "product/product_list";
@@ -83,7 +83,7 @@ public class ProductController {
     @RequestMapping("/search")
     public String searchProducts(@RequestParam String query, Model model) {
 
-        List<Product> productList = customerService.searchPagedProducts(0, query);
+        List<Product> productList = productService.searchProductsByName(0, query);
         model.addAttribute("productList", productList);
         return "product/product_list";
     }

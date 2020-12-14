@@ -37,30 +37,34 @@ The above copyright notice and this permission notice shall be included in all c
 <div class="main main-raised">
     <div class="container">
         <nav th:replace="fragment/inner_nav :: inner-nav"></nav>
-            <div class="card-body">
-                <div class="alert alert-default" id="status"></div>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="">
-                        <th>Product Id</th>
-                        <th>Winning Amount</th>
-                        <th>Pending Balance</th>
-                        <th>Bid Won Date</th>
-                        </thead>
-                        <tbody>
-                        <tr th:each="bid: ${bidsWon}">
-                            <td><span th:text="${bid.product.productId}"></span></td>
-                            <td>$<span th:text="${bid.bidFinalAmount}"></span></td>
-                            <td><span th:text="${bid.balanceAmount}"></span></td>
-                            <td><span th:text="${bid.dateWon}"></span></td>
-                            <td th:if="${not bid.hasCustomerPaid}"><button><a th:href="@{/bid/fullPayment/{bidWonId}(bidWonId=${bid.bidWonId})}">Pay Balance</a></button></td>
-                            <td th:if="${bid.hasCustomerPaid and not bid.product.received}"><button id="receivedProductBtn" th:onclick="|productReceived(${bid.product.productId})|">Product Received</button></td>
-                            <td th:if="${bid.hasCustomerPaid and bid.product.received}"><button><a th:href="@{/bid/printInvoice/{bidWonId}(bidWonId=${bid.bidWonId})}">Print invoice</a></button></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+        <div class="card-body" th:object="${bidWon}">
+            <h3>Invoice to: </h3>
+            <br><br>
+            <b th:text="${bidWon.bidWinner.firstName}"></b>
+            <br><br>
+
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="">
+                    <th>Product Id</th>
+                    <th>Item description</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><span th:text="${bidWon.product.productId}"></span></td>
+                        <td>$<span th:text="${bidWon.product.name}"></span></td>
+                        <td>1</td>
+                        <td><span th:text="${bidWon.bidFinalAmount}"></span></td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
+
+            <br><br><br>
+            Thanks for doing business with us.
+        </div>
         <br>
     </div>
 </div>

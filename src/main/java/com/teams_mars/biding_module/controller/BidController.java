@@ -49,7 +49,7 @@ public class BidController {
             if (link.getRel().equals("approval_url")) return "redirect:" + link.getHref();
         }
 
-        return "index";
+        return "error";
     }
 
     @RequestMapping("/fullPayment/{bidWonId}")
@@ -115,6 +115,13 @@ public class BidController {
     public String getBids(@PathVariable int productId, Model model) {
         model.addAttribute("bidHistory", bidService.getProductBidHistory(productId));
         return "product/bid_history";
+    }
+
+    @RequestMapping("/printInvoice/{bidWonId}")
+    public String printInvoice(@PathVariable int bidWonId, Model model) {
+        BidWon bidWon = bidService.getInvoice(bidWonId);
+        model.addAttribute("bidWon", bidWon);
+        return "/product/invoice";
     }
 
     @ResponseBody
