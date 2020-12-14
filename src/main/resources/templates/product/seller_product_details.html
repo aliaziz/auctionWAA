@@ -75,8 +75,8 @@ The above copyright notice and this permission notice shall be included in all c
                     </h4>
                     <hr>
                     <b>Categories : </b>
-                    <h6 class="card-subtitle mb-2 text-muted" th:each="cat:${product.category}">
-                        <b th:text="${cat.name}"></b>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        <b th:text="*{categoryNameList}"></b>
                     </h6>
                     <br>
                     <b>Has Bids : </b>
@@ -96,28 +96,28 @@ The above copyright notice and this permission notice shall be included in all c
                     <hr>
                     <div class="row">
                         <div class="col-md-6">
+                            <p style="font-size: 14px">Starting Price: $<b th:text="*{startingPrice}"> Starting Price:</b></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p style="font-size: 14px">Allowed Deposit: $<b th:text="*{deposit}"> Allowed Deposit:</b></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
                             <p>Is Product Released :<b th:text="*{isReleased}">Is Product Released:</b></p>
                         </div>
                     </div>
                     <hr>
-                    <div class="row" th:if="${product.isReleased== false }">
-                        <a th:href="@{/product/update/{productId}(productId=${product.productId})}"
-                           th:text="#{form.update}" class="btn btn-primary pull-right btn-round">Update</a>
-                        <a th:href="@{/product/delete/{productId}(productId=${product.productId})}"
-                           th:text="#{form.delete}" class="btn btn-primary pull-right btn-round">Delete</a>
+                    <div class="row" th:if="${product.isReleased==false }">
+                        <a th:href="@{/product/update/{productId}(productId=${product.productId})}" th:text="#{form.update}" class="btn btn-primary pull-right btn-round">Update</a>
+                        <a th:href="@{/product/delete/{productId}(productId=${product.productId})}"  th:text="#{form.delete}" class="btn btn-primary pull-right btn-round">Delete</a>
                         <div class="clearfix"></div>
                     </div>
-                    <div class="row" th:unless="${product.isReleased== true }">
-                        <div th:if="${product.hasBid==true}">
-                            <a th:href="@{/product/update/{productId}(productId=${product.productId})}"
-                               th:text="#{form.update}" class="btn btn-primary pull-right btn-round">Update</a>
-                            <a th:href="@{/product/delete/{productId}(productId=${product.productId})}"
-                               th:text="#{form.delete}" class="btn btn-primary pull-right btn-round">Delete</a>
-                            <div class="clearfix"></div>
-                        </div>
-                        <div th:unless="${product.isReleased==false}">
-                            <div class="clearfix"></div>
-                        </div>
+                    <div class="row" th:if="${product.isReleased== true && product.hasBid==false}">
+                        <a th:href="@{/product/update/{productId}(productId=${product.productId})}" th:text="#{form.update}" class="btn btn-primary pull-right btn-round">Update</a>
+                        <a th:href="@{/product/delete/{productId}(productId=${product.productId})}"  th:text="#{form.delete}" class="btn btn-primary pull-right btn-round">Delete</a>
+                        <div class="clearfix"></div>
                     </div>
                 </div>
             </div>

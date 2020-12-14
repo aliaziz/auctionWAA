@@ -71,9 +71,9 @@ public class Product {
     private Integer imageCount;
     private Boolean isReleased;
     private boolean hasBid;
+    private String categoryNameList;
 
     @Transient
-//    @NotBlank
     private MultipartFile[] multipartFiles;
 }
 

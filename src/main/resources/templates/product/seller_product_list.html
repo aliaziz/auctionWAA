@@ -27,6 +27,19 @@ The above copyright notice and this permission notice shall be included in all c
         <nav th:replace="fragment/inner_nav :: inner-nav"></nav>
         <div class="section text-center">
             <div class="features">
+                <div th:if="${msg}">
+                    <div class="alert alert-success">
+                        <div class="container">
+                            <div class="alert-icon">
+                                <i class="material-icons">check</i>
+                            </div>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true"><i class="material-icons">clear</i></span>
+                            </button>
+                            <b th:text="${msg}">Success Alert:</b>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-lg-4 col-md-4 col-sm-6" th:each="product: ${productList}">
                         <div class="fh5co-card-item">
@@ -36,17 +49,20 @@ The above copyright notice and this permission notice shall be included in all c
                                     <img th:src="@{${product.imagePath}}" alt="Image" class="img-responsive">
                                 </figure>
                                 <div class="fh5co-text">
+                                    <h2><span style="color: #3f3f3f; font-weight:bold " th:text="${product.name}"></span></h2>
                                     <h2><span th:text="${product.description}"></span></h2>
                                     <div class="row">
-                                        <div class="col-md-4"><p><b style="font-size: 20px">$<span th:text="${product.startingPrice}" style="font-size: 20px; font-weight: bold"></span></b></p></div>
-                                        <div class="col-md-4"><p><b style="color: #919191"><span th:text="${product.getBidList().size()}" style="color: #919191; font-weight: bold"></span> bids</b></p></div>
-                                        <div class="col-md-4"><p><b style="color: red">Bid due date: <span th:text="${product.getBidDueDate()}" style="color: red; font-weight: bold"></span></b></p></div>
+                                        <div class="col-md-12"><p><b style="font-size: 15px">Starting Bid: $<span th:text="${product.startingPrice}" style="font-size: 20px;color: #3f3f3f; font-weight:bold " ></span></b></p></div>
                                     </div>
-                                    <p style="text-align: left">Free shipping</p>
-
+                                    <div class="row">
+                                        <div class="col-md-12"><p><b>Bid due date: <span th:text="${product.getBidDueDate()}" style="color: red; font-weight: bold"></span></b></p></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12"><p><b style="color: #919191"><span th:text="${product.getBidList().size()}" style="color: #919191; font-weight: bold"></span> Bids received</b></p></div>
+                                    </div>
                                 </div>
                             </a>
-                            <p><a th:href="@{/product/myProducts/{productId}(productId = ${product.productId})}"><span class="btn btn-round">Bid Now</span></a></p>
+                            <p><a th:href="@{/product/myProducts/{productId}(productId = ${product.productId})}"><span  class="btn btn-round">View Product</span></a></p>
                         </div>
 
                     </div>
@@ -59,3 +75,86 @@ The above copyright notice and this permission notice shall be included in all c
 </body>
 
 </html>
+
+
+<!--&lt;!&ndash;-->
+<!--=========================================================-->
+<!--Material Kit - v2.0.7-->
+<!--=========================================================-->
+
+<!--Product Page: https://www.creative-tim.com/product/material-kit-->
+<!--Copyright 2020 Creative Tim (https://www.creative-tim.com/)-->
+
+<!--Coded by Creative Tim-->
+
+<!--=========================================================-->
+
+<!--The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. &ndash;&gt;-->
+<!--<!DOCTYPE html>-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">-->
+
+<!--<head th:replace="fragment/head :: head"></head>-->
+
+<!--<body class="profile-page sidebar-collapse">-->
+<!--<nav th:replace="fragment/nav :: nav"></nav>-->
+<!--<div class="page-header header-filter" data-parallax="true" th:style="'background-image: url(/img/city-profile.jpg); height:200px;'"-->
+<!--     style="background-image: url('../../static/img/city-profile.jpg'); height:200px; "></div>-->
+
+<!--<div class="main main-raised">-->
+<!--    <div class="container">-->
+<!--        <div th:replace="fragment/inner-row :: inner-row"></div>-->
+<!--        <nav th:replace="fragment/inner_nav :: inner-nav"></nav>-->
+<!--        <div class="section text-center">-->
+<!--            <div class="features">-->
+<!--                <div th:if="${msg}">-->
+<!--                    <div class="alert alert-success">-->
+<!--                        <div class="container">-->
+<!--                            <div class="alert-icon">-->
+<!--                                <i class="material-icons">check</i>-->
+<!--                            </div>-->
+<!--                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
+<!--                                <span aria-hidden="true"><i class="material-icons">clear</i></span>-->
+<!--                            </button>-->
+<!--                            <b th:text="${msg}">Success Alert:</b>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="row">-->
+<!--                    <div class="col-lg-4 col-md-4 col-sm-6" th:each="product: ${productList}">-->
+<!--                        <div class="fh5co-card-item">-->
+<!--                            <a th:href="@{/product/myProducts/{productId}(productId = ${product.productId})}">-->
+<!--                                <figure>-->
+<!--                                    <div class="overlay"><i class="ti-plus"></i></div>-->
+<!--                                    <img th:src="@{/img/bg2.jpg}" alt="Image" class="img-responsive">-->
+<!--                                </figure>-->
+<!--                                <div class="fh5co-text">-->
+<!--                                    <h2><span th:text="${product.description}"></span></h2>-->
+<!--                                    <div class="row">-->
+<!--                                        <div class="col-md-4"><p><b style="font-size: 20px">$<span th:text="${product.startingPrice}" style="font-size: 20px; font-weight: bold"></span></b></p></div>-->
+<!--                                        <div class="col-md-4"><p><b style="color: #919191"><span th:text="${product.getBidList().size()}" style="color: #919191; font-weight: bold"></span> bids</b></p></div>-->
+<!--                                        <div class="col-md-4"><p><b style="color: red">Bid due date: <span th:text="${product.getBidDueDate()}" style="color: red; font-weight: bold"></span></b></p></div>-->
+<!--                                    </div>-->
+<!--                                    <p style="text-align: left">Free shipping</p>-->
+
+<!--                                </div>-->
+<!--                            </a>-->
+<!--                            <p><a th:href="@{/product/myProducts/{productId}(productId = ${product.productId})}"><span class="btn btn-round">Bid Now</span></a></p>-->
+<!--                        </div>-->
+
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <nav aria-label="Page navigation example">-->
+<!--                <ul class="pagination justify-content-center">-->
+<!--                    <li class="page-item"><a class="page-link" th:href="@{/product/0/startingPrice/{isDesc}(isDesc=${isDesc})}">1</a></li>-->
+<!--                    <li class="page-item"><a class="page-link" th:href="@{/product/1/startingPrice/{isDesc}(isDesc=${isDesc})}">2</a></li>-->
+<!--                    <li class="page-item"><a class="page-link" th:href="@{/product/2/startingPrice/{isDesc}(isDesc=${isDesc})}">3</a></li>-->
+<!--                </ul>-->
+<!--            </nav>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<!--<footer th:replace="fragment/footer :: footer"></footer>-->
+<!--</body>-->
+
+<!--</html>-->

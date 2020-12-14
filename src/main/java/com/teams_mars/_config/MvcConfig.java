@@ -15,7 +15,7 @@ public class MvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
-       // registry.addInterceptor(new LoginIntercepter()).addPathPatterns("/**").excludePathPatterns("/","/login");
+        // registry.addInterceptor(new LoginIntercepter()).addPathPatterns("/**").excludePathPatterns("/","/login");
     }
     @Bean
     public MessageSource messageSource() {
@@ -31,4 +31,6 @@ public class MvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**").addResourceLocations("file:uploads/");
     }
+
 }
+

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -102,6 +103,12 @@ public class ProductController {
             model.addAttribute("category", categoryService.findAll());
             return "product/product_form";
         }
+        StringBuilder catNameList=new StringBuilder();
+        for (Category cat:product.getCategory()){
+            catNameList.append(cat.getName()).append(", ");
+        }
+        product.setCategoryNameList(catNameList.toString());
+
         List<Product> productList = productService.getAllProducts();
         int i =1;
         for(Product prodt: productList){
@@ -142,6 +149,7 @@ public class ProductController {
     public String myProducts(Model model) {
         List<Product> productList = productService.getAllSellerProducts((int) model.getAttribute("userId"));
         model.addAttribute("productList", productList);
+        model.addAttribute("isSeller", isSeller());
         return "product/seller_product_list";
     }
 
