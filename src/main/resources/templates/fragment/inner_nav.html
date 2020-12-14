@@ -2,8 +2,8 @@
     <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="btn-group" role="group">
-            <button type="button" class="btn btn-secondary"><a th:href="@{/products/}" th:text="#{form.home}">Home</a></button>
-            <button th:if="${isSeller}" type="button" class="btn btn-secondary"><a th:href="@{/products/myProducts}" th:text="#{form.sellerView}"> View My Products</a></button>
+            <button type="button" class="btn btn-secondary"><a th:href="@{/product/}" th:text="#{form.home}">Home</a></button>
+            <button th:if="${isSeller}" type="button" class="btn btn-secondary"><a th:href="@{/product/myProducts}" th:text="#{form.sellerView}"> View My Products</a></button>
             <button type="button" class="btn btn-secondary"><a th:href="@{/customer/bidsWon}">Bids won</a></button>
             <button type="button" class="btn btn-secondary"><a th:href="@{/customer/bidHistory}">Bid history</a></button>
         </div>
@@ -25,7 +25,7 @@
                     </div>
                 </li>
                 <li class="nav-item" th:if="${isSeller}">
-                    <a th:href="@{/products/add}" class="btn btn-success btn-raised btn-fab btn-round">
+                    <a th:href="@{/product/add}" class="btn btn-success btn-raised btn-fab btn-round">
                         <i class="material-icons">add</i>
                     </a>
                 </li>

@@ -27,7 +27,7 @@ function productReceived(productId) {
     let statusObj = $("#status");
 
     $.ajax({
-        url: '/products/productReceived/'+productId,
+        url: '/product/productReceived/'+productId,
         type: 'GET',
         contentType: 'application/json',
         success: function(data) {

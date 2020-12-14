@@ -107,7 +107,7 @@ public class RegistrationController {
             payPalService.createPaypalAccount(userId);
             String authority =  user.getUserRole().getRole();
             autWithAuthManager(user.getEmail(),user.getPassword(),authority);
-            return "redirect:/products/";
+            return "redirect:/product/";
         } else {
             countTries++;
             verificationService.updateVerificationCount(countTries, user);

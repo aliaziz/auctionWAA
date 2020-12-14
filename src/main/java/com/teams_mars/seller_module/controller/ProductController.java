@@ -25,8 +25,8 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @Controller
-@RequestMapping("/products")
-public class ProductsController {
+@RequestMapping("/product")
+public class ProductController {
 
     @Autowired
     private CustomerService customerService;
@@ -40,7 +40,7 @@ public class ProductsController {
     @Autowired
     CategoryService categoryService;
 
-    private final String uploadFolder = System.getProperty("user.dir") + "/uploads";
+    public static String uploadDirectory = System.getProperty("user.dir")+"/uploads";
 
     @RequestMapping("/{productId}")
     public String viewProductDetails(@PathVariable int productId,
@@ -96,32 +96,43 @@ public class ProductsController {
 
     @PostMapping("/save")
     public String saveProduct(@Valid @ModelAttribute("product") Product product, BindingResult bindingResult,
-                              RedirectAttributes redirectAttributes) throws IOException {
-        System.out.println(product);
-        if (bindingResult.hasErrors()) {
+                              RedirectAttributes redirectAttributes, Model model) throws IOException {
+        if (bindingResult.hasErrors()){
+            model.addAttribute("product", product);
+            model.addAttribute("category", categoryService.findAll());
             return "product/product_form";
         }
-        Path path = Paths.get(uploadFolder, product.getName());
+        List<Product> productList = productService.getAllProducts();
+        int i =1;
+        for(Product prodt: productList){
+            if(prodt.getName().equals(product.getName())){
+                product.setName(prodt.getName()+ i);
+                i++;
+            }
+        }
+        Path path = Paths.get(uploadDirectory, product.getName());
         try {
             Files.createDirectory(path);
-        } catch (Exception e) {
+        }
+        catch (Exception e){
             System.out.print("Directory exists, we will just proceed " +
                     "to add in pics tho this is not the desired functionality");
         }
         String[] suppressedFields = bindingResult.getSuppressedFields();
-        if (suppressedFields.length > 0) {
+        if (suppressedFields.length > 0){
             throw new RuntimeException("Attempt to bind fields that haven't been allowed " +
                     "in initBinder(): " + StringUtils.addStringToArray(suppressedFields, ", "));
         }
         //save product
-        for (MultipartFile file : product.getMultipartFiles()) {
+        for (MultipartFile file: product.getMultipartFiles()){
             Path fileNameAndPath = Paths.get(path.toString(), file.getOriginalFilename());
             Files.write(fileNameAndPath, file.getBytes());
         }
         product.setImagePath(path.toString());
+//        productRepository.save(product);
         productService.saveProduct(product);
         redirectAttributes.addFlashAttribute("msg", "Product Successfully Added!!.");
-        return "redirect:/products/";
+        return "redirect:/myProducts";
     }
 
     @GetMapping("/myProducts")
@@ -133,6 +144,7 @@ public class ProductsController {
 
     @GetMapping("/myProducts/{productId}")
     public String viewProduct(@PathVariable int productId, Model model) {
+        System.out.print(productId);
         //query DB for product with ID id
         Product product = productService.getProduct(productId).orElseThrow();
         System.out.println(product.getCategory());
@@ -144,13 +156,50 @@ public class ProductsController {
         return "product/seller_product_details";
     }
 
-    @GetMapping("/update/{product_id}")
-    public String updateProductForm(@PathVariable int product_id) {
-        return "0";
+    @GetMapping("/update/{productId}")
+    public String updateProductForm(@PathVariable int productId, Model model) {
+        Product product = productService.getProduct(productId).orElseThrow();
+        model.addAttribute("product", product);
+        model.addAttribute("category", categoryService.findAll());
+        return "product/updateProduct_form";
     }
 
-    @PostMapping("/update/{product_id}")
-    public String updateProduct(@PathVariable int product_id) {
+    @PostMapping("/update/{productId}")
+    public String updateProduct(@PathVariable int productId,
+                                @Valid @ModelAttribute("product") Product product,
+                                BindingResult bindingResult,
+                                RedirectAttributes redirectAttributes,
+                                Model model) throws IOException {
+        if (bindingResult.hasErrors()){
+            model.addAttribute("product", product);
+            model.addAttribute("category", categoryService.findAll());
+            return "product/updateProduct_form";
+        }
+        Path path = Paths.get(uploadDirectory, product.getName());
+        try {
+            Files.createDirectory(path);
+        }
+        catch (Exception e){
+            System.out.print("Directory exists, we will just proceed " +
+                    "to add in pics tho this is not the desired functionality");
+        }
+        String[] suppressedFields = bindingResult.getSuppressedFields();
+        if (suppressedFields.length > 0){
+            throw new RuntimeException("Attempt to bind fields that haven't been allowed " +
+                    "in initBinder(): " + StringUtils.addStringToArray(suppressedFields, ", "));
+        }
+        //save product
+        for (MultipartFile file: product.getMultipartFiles()){
+            Path fileNameAndPath = Paths.get(path.toString(), file.getOriginalFilename());
+            Files.write(fileNameAndPath, file.getBytes());
+        }
+        product.setImagePath(path.toString());
+//        productRepository.save(product);
+        productService.saveProduct(product);
+        redirectAttributes.addFlashAttribute("msg", "Product Successfully Added!!.");
+        Product product2 = productService.getProduct(productId).orElseThrow();
+        product2.setName(product.getName());
+
         return "0";
     }
 

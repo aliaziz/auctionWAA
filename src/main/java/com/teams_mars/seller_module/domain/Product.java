@@ -69,7 +69,7 @@ public class Product {
     private boolean isReceived;
     private String imagePath;
     private Integer imageCount;
-    private boolean isReleased;
+    private Boolean isReleased;
     private boolean hasBid;
 
     @Transient

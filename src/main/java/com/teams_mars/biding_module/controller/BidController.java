@@ -96,7 +96,7 @@ public class BidController {
                     Product product = productService.getProduct(productId).orElseThrow();
                     //Keep local records about making deposit
                     bidService.makeDeposit(product.getDeposit(), userId, productId);
-                    return "redirect:/products/"+productId;
+                    return "redirect:/product/"+productId;
                 }
                 case FULL_PAYMENT: {
                     BidWon bidWon = bidWonRepository.findBidWonByProduct_ProductId(productId);

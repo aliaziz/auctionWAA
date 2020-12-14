@@ -44,7 +44,7 @@ The above copyright notice and this permission notice shall be included in all c
                 <div class="row">
                     <div class="col-lg-4 col-md-4 col-sm-6" th:each="product: ${productList}">
                         <div class="fh5co-card-item">
-                            <a th:href="@{/products/{productId}(productId = ${product.productId})}">
+                            <a th:href="@{/product/{productId}(productId = ${product.productId})}">
                                 <figure>
                                     <div class="overlay"><i class="ti-plus"></i></div>
                                     <img th:src="@{/img/bg2.jpg}" alt="Image" class="img-responsive">
@@ -60,7 +60,7 @@ The above copyright notice and this permission notice shall be included in all c
 
                                 </div>
                             </a>
-                            <p><a th:href="@{/products/{productId}(productId = ${product.productId})}"><span class="btn btn-round">Bid Now</span></a></p>
+                            <p><a th:href="@{/product/{productId}(productId = ${product.productId})}"><span class="btn btn-round">Bid Now</span></a></p>
                         </div>
 
                     </div>
@@ -68,9 +68,9 @@ The above copyright notice and this permission notice shall be included in all c
             </div>
             <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-center">
-                    <li class="page-item"><a class="page-link" th:href="@{/products/0/startingPrice/{isDesc}(isDesc=${isDesc})}">1</a></li>
-                    <li class="page-item"><a class="page-link" th:href="@{/products/1/startingPrice/{isDesc}(isDesc=${isDesc})}">2</a></li>
-                    <li class="page-item"><a class="page-link" th:href="@{/products/2/startingPrice/{isDesc}(isDesc=${isDesc})}">3</a></li>
+                    <li class="page-item"><a class="page-link" th:href="@{/product/0/startingPrice/{isDesc}(isDesc=${isDesc})}">1</a></li>
+                    <li class="page-item"><a class="page-link" th:href="@{/product/1/startingPrice/{isDesc}(isDesc=${isDesc})}">2</a></li>
+                    <li class="page-item"><a class="page-link" th:href="@{/product/2/startingPrice/{isDesc}(isDesc=${isDesc})}">3</a></li>
                 </ul>
             </nav>
         </div>
