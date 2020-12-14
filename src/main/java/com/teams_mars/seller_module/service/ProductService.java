@@ -19,5 +19,6 @@ public interface ProductService {
     List<String> getProductImages(int productId);
     String getOneProductImage(int productId);
     List<Product> getAllSellerProducts(int id);
+    void deleteProduct(int productId);
 
 }

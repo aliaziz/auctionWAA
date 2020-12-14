@@ -78,6 +78,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public void deleteProduct(int productId) {
+        productRepository.deleteById(productId);
+    }
+
+    @Override
     public List<String> getProductImages(int productId) {
         Product product = productRepository.findById(productId).orElseThrow();
         String [] imagePaths = getFolderImages(productId);

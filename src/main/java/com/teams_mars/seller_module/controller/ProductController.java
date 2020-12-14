@@ -235,9 +235,11 @@ public class ProductController {
         return "redirect:/product/myProducts";
     }
 
-    @PostMapping("/delete/{product_id}")
-    public String deleteProduct(@PathVariable int product_id) {
-        return "0";
+    @GetMapping("/delete/{product_id}")
+    public String deleteProduct(@PathVariable int product_id, RedirectAttributes redirectAttributes) {
+        productService.deleteProduct(product_id);
+        redirectAttributes.addFlashAttribute("msg", "Product Successfully Updated!!.");
+        return "redirect:/product/myProducts";
     }
 
     @GetMapping("/add")
