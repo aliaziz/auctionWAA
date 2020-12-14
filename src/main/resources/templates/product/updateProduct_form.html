@@ -32,7 +32,7 @@ The above copyright notice and this permission notice shall be included in all c
                 <p class="card-category">Complete the product form</p>
             </div>
             <div class="card-body">
-                <form th:action="@{/product/save}" th:object="${product}" method="post" enctype="multipart/form-data">
+                <form th:action="@{/product/update/{productId}(productId=${product.productId})}" th:object="${product}" method="post" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -116,7 +116,7 @@ The above copyright notice and this permission notice shall be included in all c
 
                         <!--                        </div>-->
                     </div>
-                    <button type="submit" th:value="#{form.updatebtn}" class="btn btn-primary pull-right btn-round">Create Product</button>
+                    <button type="submit" th:value="#{form.updatebtn}" class="btn btn-primary pull-right btn-round">Update Product</button>
                     <div class="clearfix"></div>
                 </form>
             </div>

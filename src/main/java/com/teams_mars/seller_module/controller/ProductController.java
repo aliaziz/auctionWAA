@@ -42,7 +42,7 @@ public class ProductController {
     @Autowired
     CategoryService categoryService;
 
-    public static String uploadDirectory = System.getProperty("user.dir")+"/uploads";
+    public static String uploadDirectory = System.getProperty("user.dir") + "/uploads";
 
     @RequestMapping("/{productId}")
     public String viewProductDetails(@PathVariable int productId,
@@ -99,40 +99,40 @@ public class ProductController {
     @PostMapping("/save")
     public String saveProduct(@Valid @ModelAttribute("product") Product product, BindingResult bindingResult,
                               RedirectAttributes redirectAttributes, Model model) throws IOException {
-        if (bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             model.addAttribute("product", product);
             model.addAttribute("category", categoryService.findAll());
             return "product/product_form";
         }
-        StringBuilder catNameList=new StringBuilder();
-        for (Category cat:product.getCategory()){
+        StringBuilder catNameList = new StringBuilder();
+        for (Category cat : product.getCategory()) {
             catNameList.append(cat.getName()).append(", ");
         }
         product.setCategoryNameList(catNameList.toString());
+        if (product.getIsReleased()==null){product.setIsReleased(false);}
 
         List<Product> productList = productService.getAllProducts();
-        int i =1;
-        for(Product prodt: productList){
-            if(prodt.getName().equals(product.getName())){
-                product.setName(prodt.getName()+ i);
+        int i = 1;
+        for (Product prodt : productList) {
+            if (prodt.getName().equals(product.getName())) {
+                product.setName(prodt.getName() + i);
                 i++;
             }
         }
         Path path = Paths.get(uploadDirectory, product.getName());
         try {
             Files.createDirectory(path);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             System.out.print("Directory exists, we will just proceed " +
-                    "to add in pics tho this is not the desired functionality");
+                    "to add in pics to it");
         }
         String[] suppressedFields = bindingResult.getSuppressedFields();
-        if (suppressedFields.length > 0){
+        if (suppressedFields.length > 0) {
             throw new RuntimeException("Attempt to bind fields that haven't been allowed " +
                     "in initBinder(): " + StringUtils.addStringToArray(suppressedFields, ", "));
         }
         //save product
-        for (MultipartFile file: product.getMultipartFiles()){
+        for (MultipartFile file : product.getMultipartFiles()) {
             Path fileNameAndPath = Paths.get(path.toString(), file.getOriginalFilename());
             Files.write(fileNameAndPath, file.getBytes());
         }
@@ -170,8 +170,12 @@ public class ProductController {
     }
 
     @GetMapping("/update/{productId}")
-    public String updateProductForm(@PathVariable int productId, Model model) {
+    public String updateProductForm(@PathVariable int productId, Model model,RedirectAttributes redirectAttributes) {
         Product product = productService.getProduct(productId).orElseThrow();
+        if(product.isHasBid()){
+            redirectAttributes.addFlashAttribute("msg", "You can't do that!!. Don't try to break the Law");
+            return "redirect:/product/myProducts";
+        }
         model.addAttribute("product", product);
         model.addAttribute("category", categoryService.findAll());
         return "product/updateProduct_form";
@@ -183,37 +187,53 @@ public class ProductController {
                                 BindingResult bindingResult,
                                 RedirectAttributes redirectAttributes,
                                 Model model) throws IOException {
-        if (bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             model.addAttribute("product", product);
             model.addAttribute("category", categoryService.findAll());
-            return "product/updateProduct_form";
+            return "product/product_form";
         }
-        Path path = Paths.get(uploadDirectory, product.getName());
+        StringBuilder catNameList = new StringBuilder();
+        for (Category cat : product.getCategory()) {
+            catNameList.append(cat.getName()).append(", ");
+        }
+        product.setCategoryNameList(catNameList.toString());
+
+        Product productToUpdate = productService.getProduct(productId).orElseThrow();
+        productToUpdate.setName(product.getName());
+        productToUpdate.setDescription(product.getDescription());
+        productToUpdate.setStartingPrice(product.getStartingPrice());
+        productToUpdate.setDeposit(product.getDeposit());
+        productToUpdate.setBidDueDate(product.getBidDueDate());
+        productToUpdate.setBidPaymentDueDate(product.getBidPaymentDueDate());
+        productToUpdate.setCategoryNameList(product.getCategoryNameList());
+
+        if (product.getIsReleased()==null){product.setIsReleased(false);}
+        productToUpdate.setIsReleased(product.getIsReleased());
+
+        Path path = Paths.get(uploadDirectory, productToUpdate.getName());
         try {
             Files.createDirectory(path);
-        }
-        catch (Exception e){
-            System.out.print("Directory exists, we will just proceed " +
-                    "to add in pics tho this is not the desired functionality");
+        } catch (Exception e) {
+            System.out.print("Directory exists, we will just proceed " + "to add in pics in it");
         }
         String[] suppressedFields = bindingResult.getSuppressedFields();
-        if (suppressedFields.length > 0){
+        if (suppressedFields.length > 0) {
             throw new RuntimeException("Attempt to bind fields that haven't been allowed " +
                     "in initBinder(): " + StringUtils.addStringToArray(suppressedFields, ", "));
         }
         //save product
-        for (MultipartFile file: product.getMultipartFiles()){
+        for (MultipartFile file : product.getMultipartFiles()) {
             Path fileNameAndPath = Paths.get(path.toString(), file.getOriginalFilename());
             Files.write(fileNameAndPath, file.getBytes());
         }
-        product.setImagePath(path.toString());
+        productToUpdate.setImagePath(path.toString());
 //        productRepository.save(product);
-        productService.saveProduct(product);
-        redirectAttributes.addFlashAttribute("msg", "Product Successfully Added!!.");
-        Product product2 = productService.getProduct(productId).orElseThrow();
-        product2.setName(product.getName());
-
-        return "0";
+        Integer userId = (Integer) model.getAttribute("userId");
+        User owner = customerService.getCustomer(userId).orElseThrow();
+        productToUpdate.setOwner(owner);
+        productService.saveProduct(productToUpdate);
+        redirectAttributes.addFlashAttribute("msg", "Product Successfully Updated!!.");
+        return "redirect:/product/myProducts";
     }
 
     @PostMapping("/delete/{product_id}")
@@ -228,19 +248,19 @@ public class ProductController {
                 .anyMatch(role -> role.getAuthority().equals("SELLER"));
     }
 
-    private Integer getCurrentUserId(){
+    private Integer getCurrentUserId() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Integer userId=0;
-        if(principal instanceof User){
-             userId = ((User)principal).getUserId();
-        }else{
-            String username = principal. toString();
+        Integer userId = 0;
+        if (principal instanceof User) {
+            userId = ((User) principal).getUserId();
+        } else {
+            String username = principal.toString();
         }
         return userId;
     }
 
     @GetMapping("/add")
-    public String inputProduct(@ModelAttribute("product") Product product, Model model){
+    public String inputProduct(@ModelAttribute("product") Product product, Model model) {
         List<Category> category = categoryService.findAll();
         model.addAttribute("product", product);
         model.addAttribute("category", category);
