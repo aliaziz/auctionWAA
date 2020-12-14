@@ -91,8 +91,8 @@ public class ProductServiceImpl implements ProductService {
         List<String> imagePathsList = new ArrayList<>();
         if (imagePaths != null) {
             for (String imageName : imagePaths) {
-                String shortPath = imagesFolder.substring(imagesFolder.indexOf("/uploads/"));
-                imagePathsList.add(shortPath+"/"+imageName);
+                String shortPath = imagesFolder.substring(imagesFolder.indexOf(File.separator+"uploads"+File.separator));
+                imagePathsList.add(shortPath+File.separator+imageName);
             }
         }
 
