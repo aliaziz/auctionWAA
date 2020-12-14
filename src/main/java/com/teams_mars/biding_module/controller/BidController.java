@@ -37,9 +37,8 @@ public class BidController {
 
     @RequestMapping("/place/{productId}/{price}")
     @ResponseBody
-    public String placeBid(@PathVariable int productId, @PathVariable double price) {
-        int customerId = 1; //from Session
-        return bidService.placeBid(customerId, productId, price);
+    public String placeBid(@PathVariable int productId, @PathVariable double price, Model model) {
+        return bidService.placeBid((Integer) model.getAttribute("userId"), productId, price);
     }
 
     @RequestMapping("/deposit/{productId}")
@@ -53,8 +52,9 @@ public class BidController {
         return "index";
     }
 
-    @RequestMapping("/fullPayment")
-    public String makeFullPayment(@ModelAttribute BidWon bidWon) throws PayPalRESTException {
+    @RequestMapping("/fullPayment/{bidWonId}")
+    public String makeFullPayment(@PathVariable int bidWonId) throws PayPalRESTException {
+        BidWon bidWon = bidWonRepository.findById(bidWonId).orElseThrow();
         double amount = bidService.getBidBalanceAmount(bidWon.getBidWonId());
         int productId = bidWon.getProduct().getProductId();
         Payment payment = payPalService.createPayment(amount, productId, PaymentEnumType.FULL_PAYMENT);
@@ -72,20 +72,19 @@ public class BidController {
                                  @RequestParam("PayerID") String payerId,
                                  Model model) throws PayPalRESTException {
 
-        model.addAttribute("userId", 1);
-        Integer userId = (Integer) model.getAttribute("userId");
+        int userId = (int) model.getAttribute("userId");
 
-        Payment payment = payPalService.executePayment(paymentId, payerId);
-        System.out.println(payment.toJSON());
+        Payment payment = payPalService.authorizePayment(paymentId, payerId);
+        PaymentEnumType enumType = PaymentEnumType.DEPOSIT;
         if (payment.getState().equals("approved")) {
-            PaymentEnumType enumType = PaymentEnumType.valueOf(paymentType);
+            enumType = PaymentEnumType.valueOf(paymentType);
 
             Transaction transaction = payment.getTransactions().get(0);
             RelatedResources relatedResources = transaction.getRelatedResources().get(0);
-            Sale sale = relatedResources.getSale();
-            String saleId = sale.getId();
-            double amount = Double.parseDouble(sale.getAmount().getTotal());
-            payPalService.savePaypalTransaction(saleId, productId, userId,
+            Authorization authorization = relatedResources.getAuthorization();
+            String authId = authorization.getId();
+            double amount = Double.parseDouble(authorization.getAmount().getTotal());
+            payPalService.savePaypalTransaction(authId, productId, userId,
                     paymentId, payerId, enumType, amount);
 
             switch (enumType) {
@@ -104,7 +103,11 @@ public class BidController {
             }
         }
 
-        return "redirect:/products/"+productId;
+        switch (enumType) {
+            case FULL_PAYMENT: return "redirect:/customer/bidsWon";
+            case DEPOSIT: return "redirect:/products/"+productId;
+            default: return "error";
+        }
     }
 
     @RequestMapping(value = "/bidHistory/{productId}", method = RequestMethod.GET)

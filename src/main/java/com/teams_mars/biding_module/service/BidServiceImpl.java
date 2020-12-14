@@ -1,8 +1,9 @@
 package com.teams_mars.biding_module.service;
 
+import com.paypal.base.rest.PayPalRESTException;
+import com.teams_mars._global_domain.User;
 import com.teams_mars.biding_module.domain.*;
 import com.teams_mars.biding_module.repository.*;
-import com.teams_mars._global_domain.User;
 import com.teams_mars.customer_module.service.CustomerService;
 import com.teams_mars.seller_module.domain.Product;
 import com.teams_mars.seller_module.service.ProductService;
@@ -28,7 +29,7 @@ public class BidServiceImpl implements BidService {
     BidRepository bidRepository;
 
     @Autowired
-    PayPalAccountRepository payPalAccountRepository;
+    LocalPayPalAccountRepository localPayPalAccountRepository;
 
     @Autowired
     CustomerService customerService;
@@ -45,6 +46,10 @@ public class BidServiceImpl implements BidService {
     @Autowired
     PayPalService payPalService;
 
+    @Autowired
+    PaypalTransactionRepository paypalTransactionRepository;
+
+
     @Override
     public String placeBid(int customerId, int productId, double price) {
         boolean customerVerified = customerService.isCustomerVerified(customerId);
@@ -57,10 +62,10 @@ public class BidServiceImpl implements BidService {
 
         User user = customerService.getCustomer(customerId).orElseThrow();
         Product product = productService.getProduct(productId).orElseThrow();
-        boolean isPriceLower = getHighestBidPrice(productId) >= price;
-        boolean isPriceLowerThanStartPrice = product.getStartingPrice() >= price;
+        boolean isPriceLower = price <= getHighestBidPrice(productId);
+        boolean isPriceLowerThanStartPrice = price <= product.getStartingPrice();
 
-        if (isPriceLower && isPriceLowerThanStartPrice) return "Price must be higher than current highest";
+        if (isPriceLower || isPriceLowerThanStartPrice) return "Price must be higher than current highest";
 
         Bid bid = new Bid();
         bid.setProduct(product);
@@ -102,8 +107,8 @@ public class BidServiceImpl implements BidService {
     public boolean makeDeposit(double amount, int customerId, int productId) {
         User user = customerService.getCustomer(customerId).orElseThrow();
         Product product = productService.getProduct(productId).orElseThrow();
-        PaypalAccount paypalAccount = payPalAccountRepository.findByCustomer_UserId(customerId);
-        double availableBalance = paypalAccount.getAvailableBalance();
+        LocalPaypalAccount localPaypalAccount = localPayPalAccountRepository.findByCustomer_UserId(customerId);
+        double availableBalance = localPaypalAccount.getAvailableBalance();
 
         if (product.getDeposit() == amount && availableBalance >= amount) {
             //Update the withheld table amount to the current deposit
@@ -115,11 +120,11 @@ public class BidServiceImpl implements BidService {
 
             //Update the paypal account, reduce new available balance
             double currentAvailableBalance = availableBalance - amount;
-            double currentPayPalWithHeldAmount = paypalAccount.getTotalWithHeldAmount() + amount;
+            double currentPayPalWithHeldAmount = localPaypalAccount.getTotalWithHeldAmount() + amount;
 
-            paypalAccount.setAvailableBalance(currentAvailableBalance);
-            paypalAccount.setTotalWithHeldAmount(currentPayPalWithHeldAmount);
-            payPalAccountRepository.save(paypalAccount);
+            localPaypalAccount.setAvailableBalance(currentAvailableBalance);
+            localPaypalAccount.setTotalWithHeldAmount(currentPayPalWithHeldAmount);
+            localPayPalAccountRepository.save(localPaypalAccount);
             return true;
         }
         return false;
@@ -129,7 +134,7 @@ public class BidServiceImpl implements BidService {
     public boolean makeFullPayment(BidWon bidWon) {
         Product product = bidWon.getProduct();
         User user = bidWon.getBidWinner();
-        PaypalAccount paypalAccount = payPalAccountRepository.findByCustomer_UserId(user.getUserId());
+        LocalPaypalAccount paypalAccount = localPayPalAccountRepository.findByCustomer_UserId(user.getUserId());
 
         double finalToBePaidAmount = bidWon.getBalanceAmount();
         double currentAvailableBalance = paypalAccount.getAvailableBalance();
@@ -144,7 +149,7 @@ public class BidServiceImpl implements BidService {
         bidWon.setCustMadePaymentDate(LocalDateTime.now());
         product.setPaymentMade(true);
 
-        payPalAccountRepository.save(paypalAccount);
+        localPayPalAccountRepository.save(paypalAccount);
         productService.saveProduct(product);
         bidWonRepository.save(bidWon);
 
@@ -156,8 +161,8 @@ public class BidServiceImpl implements BidService {
         productService.getProduct(productId)
                 .ifPresent(product -> {
                     product.setReceived(true);
-                    paySeller(productId);
                     productService.saveProduct(product);
+                    paySeller(productId);
                 });
     }
 
@@ -169,6 +174,18 @@ public class BidServiceImpl implements BidService {
 
         if (bidWon.isSellerPaid()) return false;
 
+        PaypalTransaction ppTransaction = paypalTransactionRepository
+                .findByCustomer_UserIdAndProduct_ProductIdAndPaymentEnumType(
+                        bidWon.getBidWinner().getUserId(),
+                        bidWon.getProduct().getProductId(),
+                        PaymentEnumType.FULL_PAYMENT.name());
+
+        try {
+            payPalService.transferToSeller(ppTransaction);
+        } catch (PayPalRESTException e) {
+            e.printStackTrace();
+        }
+
         Transaction transaction = new Transaction();
         transaction.setAmount(bidFinalPayment);
         transaction.setBuyer(bidWon.getBidWinner());
@@ -177,11 +194,11 @@ public class BidServiceImpl implements BidService {
         transaction.setTransactionDate(LocalDateTime.now());
         transactionRepository.save(transaction);
 
-        PaypalAccount sellerAccount = payPalAccountRepository.findByCustomer_UserId(seller.getUserId());
+        LocalPaypalAccount sellerAccount = localPayPalAccountRepository.findByCustomer_UserId(seller.getUserId());
         sellerAccount.setAvailableBalance(sellerAccount.getAvailableBalance() + bidFinalPayment);
         sellerAccount.setTotalBalance(sellerAccount.getTotalBalance() + bidFinalPayment);
 
-        payPalAccountRepository.save(sellerAccount);
+        localPayPalAccountRepository.save(sellerAccount);
         bidWon.setSellerPaid(true);
 
         return true;
@@ -212,22 +229,32 @@ public class BidServiceImpl implements BidService {
         int productId = bidWon.getProduct().getProductId();
         double refundableAmount = bidWon.getBidFinalAmount();
 
-        boolean depositRefunded = payPalService.refundPayment(userId, productId, PaymentEnumType.DEPOSIT.name());
-        boolean balanceRefunded = payPalService.refundPayment(userId, productId, PaymentEnumType.FULL_PAYMENT.name());
-        if (depositRefunded && balanceRefunded) {
+        List<PaypalTransaction> ppTransactions = paypalTransactionRepository
+                .findAllByCustomer_UserIdAndProduct_ProductId(userId, productId);
+
+        boolean refunded = false;
+        for (PaypalTransaction transaction : ppTransactions) {
+            try {
+                refunded = payPalService.refundPayment(transaction);
+            } catch (PayPalRESTException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (refunded) {
 
             Product product = bidWon.getProduct();
-            PaypalAccount paypalAccount = payPalAccountRepository.findByCustomer_UserId(userId);
+            LocalPaypalAccount localPaypalAccount = localPayPalAccountRepository.findByCustomer_UserId(userId);
 
-            double currentAvailableBalance = paypalAccount.getAvailableBalance();
-            double currentTotalBalance = paypalAccount.getTotalBalance();
+            double currentAvailableBalance = localPaypalAccount.getAvailableBalance();
+            double currentTotalBalance = localPaypalAccount.getTotalBalance();
 
-            paypalAccount.setAvailableBalance(currentAvailableBalance + refundableAmount);
-            paypalAccount.setTotalBalance(currentTotalBalance + refundableAmount);
+            localPaypalAccount.setAvailableBalance(currentAvailableBalance + refundableAmount);
+            localPaypalAccount.setTotalBalance(currentTotalBalance + refundableAmount);
 
             product.setPaymentMade(false);
 
-            payPalAccountRepository.save(paypalAccount);
+            localPayPalAccountRepository.save(localPaypalAccount);
             productService.saveProduct(product);
             bidWonRepository.delete(bidWon);
         } else throw new RuntimeException("Failed to refund deposit or balance amount.");
@@ -243,17 +270,17 @@ public class BidServiceImpl implements BidService {
      * @param productId
      */
     private void chargeDeposit(int userId, int productId) {
-        PaypalAccount paypalAccount = payPalAccountRepository.findByCustomer_UserId(userId);
+        LocalPaypalAccount localPaypalAccount = localPayPalAccountRepository.findByCustomer_UserId(userId);
         Product product = productService.getProduct(productId).orElseThrow();
 
         double productDeposit = product.getDeposit();
-        double currentWithHeldAmount = paypalAccount.getTotalWithHeldAmount();
-        double currentTotalBalance = paypalAccount.getTotalBalance();
+        double currentWithHeldAmount = localPaypalAccount.getTotalWithHeldAmount();
+        double currentTotalBalance = localPaypalAccount.getTotalBalance();
 
-        paypalAccount.setTotalWithHeldAmount(currentWithHeldAmount - productDeposit);
-        paypalAccount.setTotalBalance(currentTotalBalance - productDeposit);
+        localPaypalAccount.setTotalWithHeldAmount(currentWithHeldAmount - productDeposit);
+        localPaypalAccount.setTotalBalance(currentTotalBalance - productDeposit);
 
-        payPalAccountRepository.save(paypalAccount);
+        localPayPalAccountRepository.save(localPaypalAccount);
     }
 
     /**
@@ -300,8 +327,6 @@ public class BidServiceImpl implements BidService {
         productService
                 .getProduct(productId)
                 .ifPresent(product -> {
-                    product.setClosed(true);
-                    productService.saveProduct(product);
                     saveBidWonRecord(product, bidWinner);
                 });
 
@@ -320,25 +345,33 @@ public class BidServiceImpl implements BidService {
      * @param productId
      */
     private void returnDeposit(int userId, int productId) {
-        boolean payPalRefunded = payPalService.refundPayment(userId, productId, PaymentEnumType.DEPOSIT.name());
+        PaypalTransaction paypalTransaction = paypalTransactionRepository
+                .findByCustomer_UserIdAndProduct_ProductIdAndPaymentEnumType(userId, productId, PaymentEnumType.DEPOSIT.name());
+        boolean payPalRefunded = false;
+        try {
+            payPalRefunded = payPalService.refundPayment(paypalTransaction);
+        } catch (PayPalRESTException e) {
+            e.printStackTrace();
+        }
+
         if (payPalRefunded) {
             WithHeldAmount withHeldAmountObj = withHeldRepository
                     .findByCustomer_UserIdAndProductHeld_ProductId(userId, productId)
                     .orElseThrow();
 
-            PaypalAccount paypalAccount = payPalAccountRepository
+            LocalPaypalAccount localPaypalAccount = localPayPalAccountRepository
                     .findByCustomer_UserId(userId);
 
             double withHeldAmount = withHeldAmountObj.getAmount();
-            double paypalWithHeldAmount = paypalAccount.getTotalWithHeldAmount();
+            double paypalWithHeldAmount = localPaypalAccount.getTotalWithHeldAmount();
             double currentPaypalWithHeldAmount = paypalWithHeldAmount - withHeldAmount;
-            double currentPaypalAvailableBalance = paypalAccount.getAvailableBalance() + withHeldAmount;
+            double currentPaypalAvailableBalance = localPaypalAccount.getAvailableBalance() + withHeldAmount;
 
             withHeldRepository.delete(withHeldAmountObj);
 
-            paypalAccount.setTotalWithHeldAmount(currentPaypalWithHeldAmount);
-            paypalAccount.setAvailableBalance(currentPaypalAvailableBalance);
-            payPalAccountRepository.save(paypalAccount);
+            localPaypalAccount.setTotalWithHeldAmount(currentPaypalWithHeldAmount);
+            localPaypalAccount.setAvailableBalance(currentPaypalAvailableBalance);
+            localPayPalAccountRepository.save(localPaypalAccount);
         } else throw new RuntimeException("Failed to refund paypal deposit.");
     }
 
@@ -350,10 +383,14 @@ public class BidServiceImpl implements BidService {
                     LocalDateTime currentDate = LocalDateTime.now();
                     LocalDateTime dueDate = p.getBidDueDate();
                     return currentDate.isAfter(dueDate) || currentDate.isEqual(dueDate);
-                }).forEach(p -> {
+                })
+                .forEach(p -> {
+                    p.setClosed(true);
+                    productService.saveProduct(p);
+
                     getHighestBidder(p.getProductId())
                             .ifPresent(bidWinner -> returnAllDeposits(p.getProductId(), bidWinner));
-        });
+                });
     }
 
     @Scheduled(fixedDelay = 300000, initialDelay = 120000)
@@ -374,7 +411,7 @@ public class BidServiceImpl implements BidService {
      * Checks if customer paid, if product is shipped and today's date is higher than 3days since the
      * customer paid for the product.
      */
-    @Scheduled(fixedDelay = 300000, initialDelay = 120000)
+    @Scheduled(fixedDelay = 500000, initialDelay = 150000)
     private void checkIfProductShipped() {
         List<BidWon> bidWonList = new ArrayList<>();
         bidWonRepository.findAll().forEach(bidWonList::add);

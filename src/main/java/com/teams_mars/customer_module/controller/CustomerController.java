@@ -19,16 +19,16 @@ public class CustomerController {
 
     @RequestMapping("/bidHistory")
     public String customerBidHistory(Model model) {
-        int customerId = 1; //TODO: Replace with user id from session
-        List<Bid> customerBidHistory = bidService.getCustomerBidHistory(customerId);
+        int userId = (int) model.getAttribute("userId");
+        List<Bid> customerBidHistory = bidService.getCustomerBidHistory(userId);
         model.addAttribute("bidHistory", customerBidHistory);
         return "product/bid_history";
     }
 
     @RequestMapping("/bidsWon")
     public String customerBidsWon(Model model) {
-        int customerId = 1; //TODO: Replace with user id from session
-        List<BidWon> customerBidHistory = bidService.getCustomerBidsWon(customerId);
+        int userId = (int) model.getAttribute("userId");
+        List<BidWon> customerBidHistory = bidService.getCustomerBidsWon(userId);
         model.addAttribute("bidsWon", customerBidHistory);
         return "product/bids_won";
     }

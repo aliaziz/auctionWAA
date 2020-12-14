@@ -2,6 +2,7 @@ package com.teams_mars.registration_login_module.controller;
 
 import com.teams_mars._global_domain.Role;
 import com.teams_mars._global_domain.User;
+import com.teams_mars.biding_module.service.PayPalService;
 import com.teams_mars.customer_module.service.RoleService;
 import com.teams_mars.customer_module.service.UserService;
 import com.teams_mars.customer_module.service.VerificationService;
@@ -28,6 +29,9 @@ public class RegistrationController {
     UserService userService;
     RoleService roleService;
     VerificationService verificationService;
+
+    @Autowired
+    private PayPalService payPalService;
 
     @Autowired
     protected AuthenticationManager authenticationManager;
@@ -100,6 +104,7 @@ public class RegistrationController {
             verificationService.updateVerificationCount(0, user);
 
             session.setAttribute("userId", userId);
+            payPalService.createPaypalAccount(userId);
             String authority =  user.getUserRole().getRole();
             autWithAuthManager(user.getEmail(),user.getPassword(),authority);
             return "redirect:/products/";

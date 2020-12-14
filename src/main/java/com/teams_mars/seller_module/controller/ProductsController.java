@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.ServletContext;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,9 +35,6 @@ public class ProductsController {
 
     @Autowired
     private BidService bidService;
-
-    @Autowired
-    private ServletContext servletContext;
 
     private final String uploadFolder = System.getProperty("user.dir") + "/uploads";
 

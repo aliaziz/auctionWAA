@@ -15,7 +15,7 @@ public class PaypalTransaction {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer paypalTransactionId;
 
-    private String saleId;
+    private String authId;
     private String payerId;
     private String paymentId;
     private String paymentEnumType;

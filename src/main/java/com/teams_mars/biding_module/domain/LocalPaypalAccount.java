@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Setter
-public class PaypalAccount {
+public class LocalPaypalAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer paypalAccountId;

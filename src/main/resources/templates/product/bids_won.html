@@ -53,8 +53,9 @@ The above copyright notice and this permission notice shall be included in all c
                             <td>$<span th:text="${bid.bidFinalAmount}"></span></td>
                             <td><span th:text="${bid.balanceAmount}"></span></td>
                             <td><span th:text="${bid.dateWon}"></span></td>
-                            <td th:if="${not bid.hasCustomerPaid}"><button><a th:href="@{/bid/fullPayment}">Pay Balance</a></button></td>
-                            <td th:if="${bid.hasCustomerPaid}"><button th:onclick="|productReceived(${bid.product.productId})|">Product Received</button></td>
+                            <td th:if="${not bid.hasCustomerPaid}"><button><a th:href="@{/bid/fullPayment/{bidWonId}(bidWonId=${bid.bidWonId})}">Pay Balance</a></button></td>
+                            <td th:if="${bid.hasCustomerPaid and not bid.product.received}"><button id="receivedProductBtn" th:onclick="|productReceived(${bid.product.productId})|">Product Received</button></td>
+                            <td th:if="${bid.hasCustomerPaid and bid.product.received}"><span th:text="${bid.bidWinner.firstName}"></span> thanks for bidding.</td>
                         </tr>
                         </tbody>
                     </table>

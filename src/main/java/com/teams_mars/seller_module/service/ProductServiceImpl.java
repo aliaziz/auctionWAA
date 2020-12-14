@@ -10,10 +10,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -41,7 +43,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> getAllSellerProducts(int id) {
-
         return productRepository.findAllByOwner_UserId(id);
     }
 
@@ -57,7 +58,11 @@ public class ProductServiceImpl implements ProductService {
 
         Pageable pageable = PageRequest.of(pageNum, 6, sort);
         Page<Product> productList = productRepository.findAll(pageable);
-        return productList.toList();
+        return productList.toList()
+                .stream()
+                .filter(product -> !product.isClosed())
+                .filter(product -> LocalDateTime.now().isBefore(product.getBidDueDate()))
+                .collect(Collectors.toList());
     }
 
     @Override

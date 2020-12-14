@@ -49,7 +49,7 @@ The above copyright notice and this permission notice shall be included in all c
                         <tbody>
                         <tr th:each="bid: ${bidHistory}">
                             <td><span th:text="${bid.bidId}"></span></td>
-                            <td><span th:text="${bid.customer.fullName}"></span></td>
+                            <td><span th:text="${bid.customer.firstName}"></span> <span th:text="${bid.customer.lastName}"></span></td>
                             <td>$<span th:text="${bid.price}"></span></td>
                             <td><span th:text="${bid.bidDate}"></span></td>
                         </tr>

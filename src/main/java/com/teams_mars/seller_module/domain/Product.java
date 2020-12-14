@@ -1,18 +1,16 @@
 package com.teams_mars.seller_module.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.teams_mars._global_domain.User;
 import com.teams_mars.admin_module.domain.Category;
 import com.teams_mars.biding_module.domain.Bid;
 import com.teams_mars.biding_module.domain.WithHeldAmount;
-import com.teams_mars._global_domain.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -26,9 +24,6 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int productId;
-
-
-
 
     @ManyToMany(mappedBy = "productList")
     @JsonBackReference
@@ -61,12 +56,10 @@ public class Product {
     private String description;
 
     @NotNull
-    @FutureOrPresent
     @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm")
     private LocalDateTime bidDueDate;
 
     @NotNull
-    @Future
     @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm")
     private LocalDateTime bidPaymentDueDate;
 
