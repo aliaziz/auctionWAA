@@ -1,29 +1,87 @@
+<!--
+=========================================================
+Material Kit - v2.0.7
+=========================================================
+
+Product Page: https://www.creative-tim.com/product/material-kit
+Copyright 2020 Creative Tim (https://www.creative-tim.com/)
+
+Coded by Creative Tim
+
+=========================================================
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. -->
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:https="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="UTF-8">
-    <title>Verification Page</title>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" ></script>
-    <script type="text/javascript" th:src="@{/js/main.js}"></script>
-</head>
-<body>
+<html lang="en" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5" xmlns:th="https://www.thymeleaf.org">
 
-<h1>Thank You Registered Successfully ..........</h1>
-<h2>Verification Page.........</h2>
-<h2 style="color: #FF1C19">We sent you a code to your email to verify its you !!!</h2>
+<head th:replace="fragment/head :: head"></head>
 
-<form method="get" action="/verifyAccount" >
-<p>Enter your Verifcation code Here : <input type="text" id="verify " name="verificationNumber">
-    <input type="hidden" name="userId" th:value="${unverifiedUser.userId}" >
-<button type="submit">Verify</button></p>
-    <div >
-        <p style="color: red" th:text="${message}"></p>
+<body class="profile-page sidebar-collapse">
+
+<!--<div class="page-header header-filter" data-parallax="true"-->
+<!--     th:style="'background-image: url(/img/bg2.jpg);'" style="background-image: url('../static/img/bg2.jpg'); height:200px; "></div>-->
+
+<div class="main main-raised">
+  <div class="profile-content container">
+
+    <nav class="navbar navbar-expand-lg" style="background-color: #e9ecef;">
+      <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <ol class="breadcrumb" style="background-color: white; margin-bottom: 2px">
+          <li class="breadcrumb-item"><a href="#" th:href="@{/}">Home</a></li>
+          <li class="breadcrumb-item active" aria-current="page"><a href="#">Admin</a></li>
+        </ol>
+
+      </div><!-- /.container-->
+    </nav>
+    <br>
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h4 class="card-title">Verification Page</h4>
+        <p class="card-category">Congratulation, You Registered Successfully !!! Please, Enter the verification code we sent you to your email below. </p>
+      </div>
+      <div class="card-body">
+        <form  method="get" th:action="@{/verifyAccount}" action="#" >
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating"> Enter your Verifcation code Here :</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating">Verification Code</label>
+                <input type="text" id="verify " name="verificationNumber">
+                <input type="hidden" name="userId" th:value="${unverifiedUser.userId}" >
+            </div>
+          </div>
+
+            </div>
+          <div class="row">
+            <div class="col-md-6">
+                <p style="color: red" th:text="${message}"></p>
+            </div>
+
+          </div>
+
+
+          <br/>
+          <br>
+          <button type="submit" class="btn btn-primary pull-right">Verify Account</button>
+
+          <div class="clearfix"></div>
+        </form>
+        <button id="resend"  class="btn btn-primary pull-left" th:data="${unverifiedUser.userId}"> Resend Verification Code</button>
+      </div>
     </div>
+  </div>
+</div>
 
-    <!-- We will use ajax and on success it will display him a congratulation and a link to the login page -->
-</form>
+<footer th:replace="fragment/footer :: footer"></footer>
 
-<button id="resendButtton"  type="submit" th:data="${unverifiedUser.userId}"> Resend Code</button>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" ></script>
+<script type="text/javascript" th:src="@{/js/registration/main.js}"></script>
 
 </body>
+
 </html>

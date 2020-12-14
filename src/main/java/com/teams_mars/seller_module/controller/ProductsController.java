@@ -1,6 +1,7 @@
 package com.teams_mars.seller_module.controller;
 
 import com.teams_mars.admin_module.domain.Category;
+import com.teams_mars.admin_module.impl.CategoryService;
 import com.teams_mars.biding_module.service.BidService;
 import com.teams_mars.customer_module.service.CustomerService;
 import com.teams_mars.seller_module.domain.Product;
@@ -35,6 +36,9 @@ public class ProductsController {
 
     @Autowired
     private BidService bidService;
+
+    @Autowired
+    CategoryService categoryService;
 
     private final String uploadFolder = System.getProperty("user.dir") + "/uploads";
 
@@ -88,11 +92,6 @@ public class ProductsController {
     public boolean productReceived(@PathVariable int productId) {
         bidService.productReceived(productId);
         return true;
-    }
-
-    @GetMapping("/add")
-    public String inputProduct(@ModelAttribute("product") Product product) {
-        return "product/product_form";
     }
 
     @PostMapping("/save")
@@ -167,4 +166,11 @@ public class ProductsController {
                 .anyMatch(role -> role.getAuthority().equals("SELLER"));
     }
 
+    @GetMapping("/add")
+    public String inputProduct(@ModelAttribute("product") Product product, Model model){
+        List<Category> category = categoryService.findAll();
+        model.addAttribute("product", product);
+        model.addAttribute("category", category);
+        return "product/product_form";
+    }
 }

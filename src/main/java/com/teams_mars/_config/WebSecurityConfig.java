@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
@@ -17,33 +17,38 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 import javax.sql.DataSource;
 
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true,prePostEnabled = true)
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     DataSource dataSource;
 
+    private final String usersQuery = "select email,password,1 from user where email=?";
+    private final String rolesQuery = "select u.email, r.role from user u inner join user_role ur on(u.user_id=ur.user_id) inner join role r on(ur.role_id=r.role_id) where u.email=?";
+
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
-        auth.inMemoryAuthentication()
-                .withUser("user")
-                .password("abc")
-                .roles("USER");
+        auth.jdbcAuthentication()
+                .usersByUsernameQuery(usersQuery)
+                .authoritiesByUsernameQuery(rolesQuery)
+                .dataSource(dataSource)
+                .passwordEncoder(getPasswordEncoder());
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
-                .antMatchers("/resources/**", "/static/**", "/css/**", "/img/faces/*","/img/*","/js/**", "/uploads/**");
+                .antMatchers("/resources/**", "/static/**", "/css/**", "/img/faces/*", "/img/*", "/js/**", "/static/js/registration/*");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/","/register","/ResetPassword","/verifyFromEmail",
-                        "/resendVerificationCode/*","/user/sendEmail/*","/user/changePassword","/error/*",
-                        "/registerSuccess","/verifyAccount","/h2-console/**","/db/**")
+                .antMatchers("/", "/register", "/admin-login", "/ResetPassword", "/verifyFromEmail",
+                        "/resendVerificationCode/*", "/user/sendEmail/*", "/user/changePassword", "/error/*",
+                        "/registerSuccess", "/verifyAccount", "/h2-console/**", "/db/**")
                 .permitAll()
                 .anyRequest().authenticated()
                 .and()
@@ -70,21 +75,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+    public PasswordEncoder getPasswordEncoder() {
+        return new BCryptPasswordEncoder();
     }
-
-//    @Bean
-//    public PasswordEncoder getPasswordEncoder(){
-//        return new BCryptPasswordEncoder();
-//    }
 
     @Bean
     public PersistentTokenRepository tokenRepository() {
-        JdbcTokenRepositoryImpl jdbcTokenRepositoryImpl=new JdbcTokenRepositoryImpl();
+        JdbcTokenRepositoryImpl jdbcTokenRepositoryImpl = new JdbcTokenRepositoryImpl();
         jdbcTokenRepositoryImpl.setDataSource(dataSource);
         return jdbcTokenRepositoryImpl;
     }
+
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {

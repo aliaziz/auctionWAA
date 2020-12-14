@@ -32,7 +32,7 @@ The above copyright notice and this permission notice shall be included in all c
                 <p class="card-category">Complete the product form</p>
             </div>
             <div class="card-body">
-                <form th:action="@{/products/save}" th:object="${product}" method="post" enctype="multipart/form-data">
+                <form th:action="@{/product_save}" th:object="${product}" method="post" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -96,10 +96,21 @@ The above copyright notice and this permission notice shall be included in all c
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label th:text="#{form.category}"></label>
-                                <select  multiple class="form-control selectpicker" th:field="*{category}" style="height: 70px" >
+                                <select  multiple class="form-control selectpicker" th:field="*{category}" style="height: 50px" >
 
-                                    <option th:each="cat: ${category}"
-                                            th:value="${cat.category_id}" th:text="${cat.name}">Phones</option>
+                                    <option th:each="cat: ${product.getCategory()}"
+                                            th:value="${cat.name}" th:text="${cat.name}">Phones</option>
+                                </select>
+                                <select multiple class="form-control selectpicker" style="height: 70px">
+                                    <option value="default" style="color: #8e8a8a">Choose category </option>
+                                    <option value="phones">Phones</option>
+                                    <option value="jewelry">Jewelry</option>
+                                    <option value="watches">Watches</option>
+                                    <option value="shoes">Shoes</option>
+                                    <option value="Jackets">Jackets</option>
+                                    <option value="appliances">Appliances</option>
+                                    <option value="cosmetics">Cosmetics</option>
+                                    <option value="books">Books</option>
                                 </select>
                             </div>
 
@@ -107,14 +118,13 @@ The above copyright notice and this permission notice shall be included in all c
                     </div>
                     <br>
                     <div class="row">
-<!--                        <div class="togglebutton">-->
+                        <div class="togglebutton">
                             <label style="color: #1a1a1a; font-size: 16px">
-                                Turn Switch to Release Product :</label>
-                                <input type="checkbox" name="isReleased">
-
-<!--                                <span class="toggle"></span>-->
-
-<!--                        </div>-->
+                                Turn Switch to Release Product :
+                                <input type="checkbox" th:field="*{isReleased}">
+                                <span class="toggle"></span>
+                            </label>
+                        </div>
                     </div>
                     <button type="submit" th:value="#{form.addbtn}" class="btn btn-primary pull-right btn-round">Create Product</button>
                     <div class="clearfix"></div>
