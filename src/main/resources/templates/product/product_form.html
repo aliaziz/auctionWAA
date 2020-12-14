@@ -107,14 +107,12 @@ The above copyright notice and this permission notice shall be included in all c
                     </div>
                     <br>
                     <div class="row">
-<!--                        <div class="togglebutton">-->
+                        <div class="togglebutton">
                             <label style="color: #1a1a1a; font-size: 16px">
                                 Turn Switch to Release Product :</label>
-                                <input type="checkbox" name="isReleased">
-
-<!--                                <span class="toggle"></span>-->
-
-<!--                        </div>-->
+                                <input type="checkbox" th:field="${product.isReleased}">
+                                <span class="toggle"></span>
+                        </div>
                     </div>
                     <button type="submit" th:value="#{form.addbtn}" class="btn btn-primary pull-right btn-round">Create Product</button>
                     <div class="clearfix"></div>
