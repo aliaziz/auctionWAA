@@ -2,10 +2,10 @@
     <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="btn-group" role="group">
-            <button th:if="${seller=='6'}" type="button" class="btn btn-secondary"><a th:href="@{/myProducts}" th:text="#{form.sellerView}"> View My Products</a></button>
-            <button type="button" class="btn btn-secondary">Bids won</button>
-            <button type="button" class="btn btn-secondary">Bid history</button>
-            <button type="button" class="btn btn-secondary"><a th:href="@{/home}" th:text="#{form.home}">Home</a></button>
+            <button type="button" class="btn btn-secondary"><a th:href="@{/product/}" th:text="#{form.home}">Home</a></button>
+            <button th:if="${isSeller}" type="button" class="btn btn-secondary"><a th:href="@{/product/myProducts}" th:text="#{form.sellerView}"> View My Products</a></button>
+            <button type="button" class="btn btn-secondary"><a th:href="@{/customer/bidsWon}">Bids won</a></button>
+            <button type="button" class="btn btn-secondary"><a th:href="@{/customer/bidHistory}">Bid history</a></button>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse">
@@ -24,8 +24,8 @@
                         <a class="dropdown-item" href="#">Jewelry</a>
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a href="../product/product_form.html" th:href="@{/product/add}" class="btn btn-success btn-raised btn-fab btn-round">
+                <li class="nav-item" th:if="${isSeller}">
+                    <a th:href="@{/product/add}" class="btn btn-success btn-raised btn-fab btn-round">
                         <i class="material-icons">add</i>
                     </a>
                 </li>

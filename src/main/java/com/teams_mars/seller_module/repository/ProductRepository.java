@@ -19,9 +19,7 @@ public interface ProductRepository extends PagingAndSortingRepository<Product,In
     //List<Product> findProductByName(String name);
     List<Product> findProductByCategory(String category);
 
-    Page<Product> findAllByDescription(String keyWord, Pageable pageable);
-//    Page<Product> findAllByDescription(Pageable pageable);
-
+    Page<Product> findAllByNameIsLike(String keyWord, Pageable pageable);
 
 
 }

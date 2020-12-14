@@ -47,8 +47,8 @@ The above copyright notice and this permission notice shall be included in all c
                             <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
                         </ol>
                         <div class="carousel-inner">
-                            <div class="carousel-item" th:each="image, idx: ${imageList}" th:class="${idx == 0}? active">
-                                <img class="d-block w-100" style="height: 500px" th:src="@{/img/image}" th:alt="slide" alt="image">
+                            <div class="carousel-item" th:each="image, idx: ${imageList}">
+                                <img class="d-block w-100" style="height: 500px" th:src="@{'/uploads/'+ ${product.name} +'/'+${image}}" th:alt="slide" alt="image">
                             </div>
                         </div>
                         <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
@@ -61,9 +61,9 @@ The above copyright notice and this permission notice shall be included in all c
                         </a>
                     </div>
                 </div>
-                <div class="col-md-6"><h4 class="card-title"><span th:text="*{description}"></span></h4>
+                <div class="col-md-6"><h4 class="card-title"><span th:text="*{name}"></span></h4>
                     <hr>
-                    <h6 class="card-subtitle mb-2 text-muted">Condition: New</h6>
+                    <h6 class="card-subtitle mb-2 text-muted"><span th:text="*{description}"></span></h6>
                     <h6 class="card-subtitle mb-2 text-muted">Bid due date:  <span th:text="*{bidDueDate}"></span></h6>
                     <hr>
                     <div class="row">
@@ -91,7 +91,11 @@ The above copyright notice and this permission notice shall be included in all c
                                 </div>
                                 <div id="status-area" class="col-md-8"></div>
                             </div>
-                            <button th:if="${not hasMadeDeposit}"><a th:href="@{/bid/deposit/{productId}(productId= *{productId})}">Make Deposit</a></button>
+                            <button th:if="${not hasMadeDeposit}" class="btn btn-primary btn-just-icon" style="width: 200px; height: 46px">
+                                <h4 class="card-title" style="color: white; padding-bottom: 10px">
+                                    <a th:href="@{/bid/deposit/{productId}(productId= *{productId})}">Make Deposit</a>
+                                </h4>
+                            </button>
                         </div>
                         <p class="alert-warning alert" th:if="${not isVerified}">To be eligible for bidding, please verify your account.</p>
                     </div>

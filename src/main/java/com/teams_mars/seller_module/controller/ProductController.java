@@ -1,10 +1,15 @@
 package com.teams_mars.seller_module.controller;
 
+import com.teams_mars._global_domain.User;
 import com.teams_mars.admin_module.domain.Category;
 import com.teams_mars.admin_module.impl.CategoryService;
+import com.teams_mars.biding_module.service.BidService;
+import com.teams_mars.customer_module.service.CustomerService;
 import com.teams_mars.seller_module.domain.Product;
 import com.teams_mars.seller_module.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -14,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,35 +26,76 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @Controller
+@RequestMapping("/product")
 public class ProductController {
-    //    @Autowired
-//    ProductRepository productRepository;
+
     @Autowired
-    ProductService productService;
+    private CustomerService customerService;
+
+    @Autowired
+    private ProductService productService;
+
+    @Autowired
+    private BidService bidService;
 
     @Autowired
     CategoryService categoryService;
 
     public static String uploadDirectory = System.getProperty("user.dir")+"/uploads";
-//    File file = new File(uploadDirectory);
 
-    @GetMapping("/home")
-    public String home(Model model){
-        List<Product> productList = productService.getAllProducts();
+    @RequestMapping("/{productId}")
+    public String viewProductDetails(@PathVariable int productId,
+                                     Model model) {
+        int customerId = (int) model.getAttribute("userId");
+        boolean isVerified = customerService.isCustomerVerified(customerId);
+        boolean hasMadeDeposit = bidService.hasMadeDeposit(customerId, productId);
+        Product product = productService.getProduct(productId).orElseThrow();
+        model.addAttribute("isVerified", isVerified);
+        model.addAttribute("hasMadeDeposit", hasMadeDeposit);
+        model.addAttribute("product", product);
+        model.addAttribute("imageList", productService.getProductImages(productId));
+        model.addAttribute("highestBidPrice", bidService.getHighestBidPrice(productId));
+        return "product/product_details";
+    }
+
+    @RequestMapping(value = {"/", "/home"})
+    public String showProductLists(Model model) {
+
+        List<Product> productList = customerService.viewPagedProductList(0, "startingPrice", false);
+        model.addAttribute("isSeller", isSeller());
         model.addAttribute("productList", productList);
-        model.addAttribute("seller", "6");
+        model.addAttribute("isDesc", false);
         return "product/product_list";
     }
 
-    @GetMapping("/product/add")
-    public String inputProduct(@ModelAttribute("product") Product product, Model model){
-        List<Category> category = categoryService.findAll();
-        model.addAttribute("product", product);
-        model.addAttribute("category", category);
-        return "product/product_form";
+    @RequestMapping("/{pageNum}/{attr}/{isDesc}")
+    public String showPagedProductLists(@PathVariable int pageNum,
+                                        @PathVariable String attr,
+                                        @PathVariable Boolean isDesc,
+                                        Model model) {
+
+        List<Product> productList = customerService.viewPagedProductList(pageNum, attr, isDesc);
+        model.addAttribute("isDesc", isDesc);
+        model.addAttribute("productList", productList);
+        return "product/product_list";
     }
 
-    @PostMapping("/product/save")
+    @RequestMapping("/search")
+    public String searchProducts(@RequestParam String query, Model model) {
+
+        List<Product> productList = customerService.searchPagedProducts(0, query);
+        model.addAttribute("productList", productList);
+        return "product/product_list";
+    }
+
+    @ResponseBody
+    @RequestMapping("/productReceived/{productId}")
+    public boolean productReceived(@PathVariable int productId) {
+        bidService.productReceived(productId);
+        return true;
+    }
+
+    @PostMapping("/save")
     public String saveProduct(@Valid @ModelAttribute("product") Product product, BindingResult bindingResult,
                               RedirectAttributes redirectAttributes, Model model) throws IOException {
         if (bindingResult.hasErrors()){
@@ -86,25 +131,28 @@ public class ProductController {
         }
         product.setImagePath(path.toString());
 //        productRepository.save(product);
+        Integer userId = (Integer) model.getAttribute("userId");
+        User owner = customerService.getCustomer(userId).orElseThrow();
+        product.setOwner(owner);
         productService.saveProduct(product);
         redirectAttributes.addFlashAttribute("msg", "Product Successfully Added!!.");
-        return "redirect:/myProducts";
+        return "redirect:/product/myProducts";
     }
 
     @GetMapping("/myProducts")
-    public String myProducts(Model model){
-        List<Product> productList = productService.getAllSellerProducts(6);
+    public String myProducts(Model model) {
+        List<Product> productList = productService.getAllSellerProducts((int) model.getAttribute("userId"));
         model.addAttribute("productList", productList);
         return "product/seller_product_list";
     }
 
-    @GetMapping("/product/{productId}")
-    public String viewProduct(@PathVariable int productId, Model model){
+    @GetMapping("/myProducts/{productId}")
+    public String viewProduct(@PathVariable int productId, Model model) {
         System.out.print(productId);
         //query DB for product with ID id
         Product product = productService.getProduct(productId).orElseThrow();
         System.out.println(product.getCategory());
-        for(Category cat:product.getCategory()){
+        for (Category cat : product.getCategory()) {
             System.out.println(cat.getName());
         }
         //add product to model
@@ -112,17 +160,20 @@ public class ProductController {
         return "product/seller_product_details";
     }
 
-    @GetMapping("/product/update/{productId}")
-    public String updateProductForm(@PathVariable int productId, Model model){
+    @GetMapping("/update/{productId}")
+    public String updateProductForm(@PathVariable int productId, Model model) {
         Product product = productService.getProduct(productId).orElseThrow();
         model.addAttribute("product", product);
         model.addAttribute("category", categoryService.findAll());
         return "product/updateProduct_form";
     }
 
-    @PostMapping("/product/update/{productId}")
-    public String updateProduct(@PathVariable int productId, @Valid @ModelAttribute("product") Product product, BindingResult bindingResult,
-                                RedirectAttributes redirectAttributes, Model model) throws IOException {
+    @PostMapping("/update/{productId}")
+    public String updateProduct(@PathVariable int productId,
+                                @Valid @ModelAttribute("product") Product product,
+                                BindingResult bindingResult,
+                                RedirectAttributes redirectAttributes,
+                                Model model) throws IOException {
         if (bindingResult.hasErrors()){
             model.addAttribute("product", product);
             model.addAttribute("category", categoryService.findAll());
@@ -156,11 +207,23 @@ public class ProductController {
         return "0";
     }
 
-    @PostMapping("/product/delete/{productId}")
-    public String deleteProduct(@PathVariable int productId){
+    @PostMapping("/delete/{product_id}")
+    public String deleteProduct(@PathVariable int product_id) {
         return "0";
     }
 
+    private boolean isSeller() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth.getAuthorities()
+                .stream()
+                .anyMatch(role -> role.getAuthority().equals("SELLER"));
+    }
 
-
+    @GetMapping("/add")
+    public String inputProduct(@ModelAttribute("product") Product product, Model model){
+        List<Category> category = categoryService.findAll();
+        model.addAttribute("product", product);
+        model.addAttribute("category", category);
+        return "product/product_form";
+    }
 }

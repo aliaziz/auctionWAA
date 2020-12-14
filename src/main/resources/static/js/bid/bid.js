@@ -17,8 +17,33 @@ function placeBid(productId) {
             setTimeout(function() {
                 statusResponse.empty();
                 location.reload();
-            }, 4000);
+            }, 2500);
         },
         error: function(x, s, e) {}
+    })
+}
+
+function productReceived(productId) {
+    let statusObj = $("#status");
+
+    $.ajax({
+        url: '/product/productReceived/'+productId,
+        type: 'GET',
+        contentType: 'application/json',
+        success: function(data) {
+            if (data) {
+                statusObj.html("<p>The seller has been informed. Product shipment is being prepared. </p>")
+            } else {
+                statusObj.html("<p>An error occured. Contact admin </p>")
+            }
+
+            setTimeout(function() {
+                statusObj.empty();
+                location.reload();
+            }, 2000);
+        },
+        error: function(x, s, e) {
+            statusObj.html("<p>An error occured. Contact admin </p>")
+        }
     })
 }

@@ -29,19 +29,19 @@ public class LoginIndexController {
             model.addAttribute("unverifiedUser",user1);
             return "user/verificationPage";
         }
-        return "user/index";
+        return "user/login";
     }
 
 
     @RequestMapping("/login")
     public String login() {
-        return "login";
+        return "user/login";
     }
 
     @RequestMapping("/login-error")
     public String loginError(Model model) {
         model.addAttribute("loginError", true);
-        return "login";
+        return "user/login";
     }
 
 }

@@ -4,8 +4,10 @@ package com.teams_mars.biding_module.service;
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
+import com.teams_mars.biding_module.domain.LocalPaypalAccount;
 import com.teams_mars.biding_module.domain.PaymentEnumType;
 import com.teams_mars.biding_module.domain.PaypalTransaction;
+import com.teams_mars.biding_module.repository.LocalPayPalAccountRepository;
 import com.teams_mars.biding_module.repository.PaypalTransactionRepository;
 import com.teams_mars.customer_module.service.CustomerService;
 import com.teams_mars.seller_module.service.ProductService;
@@ -32,6 +34,10 @@ public class PayPalService {
     @Autowired
     PaypalTransactionRepository paypalTransactionRepository;
 
+    @Autowired
+    LocalPayPalAccountRepository localPayPalAccountRepository;
+
+
     public static final String SUCCESS_URL = "/handlePayment";
     public static final String CANCEL_URL = "/error";
     private final String LOCAL_URL = "http://localhost:8888/bid";
@@ -56,7 +62,7 @@ public class PayPalService {
         payer.setPaymentMethod("paypal");
 
         Payment payment = new Payment();
-        payment.setIntent("sale");
+        payment.setIntent("authorize");
         payment.setPayer(payer);
         payment.setTransactions(transactions);
         RedirectUrls redirectUrls = new RedirectUrls();
@@ -67,7 +73,7 @@ public class PayPalService {
         return payment.create(context);
     }
 
-    public Payment executePayment(String paymentId, String payerId) throws PayPalRESTException{
+    public Payment authorizePayment(String paymentId, String payerId) throws PayPalRESTException {
         Payment payment = new Payment();
         payment.setId(paymentId);
         PaymentExecution paymentExecute = new PaymentExecution();
@@ -75,37 +81,30 @@ public class PayPalService {
         return payment.execute(context, paymentExecute);
     }
 
-    public boolean refundPayment(int customerId, int productId, String paymentType) {
-        boolean refunded = false;
-        PaypalTransaction paypalTransaction = paypalTransactionRepository
-                .findByCustomer_UserIdAndProduct_ProductIdAndPaymentEnumType(customerId, productId, paymentType);
+    public boolean refundPayment(PaypalTransaction paypalTransaction) throws PayPalRESTException {
+        Authorization authorization = new Authorization();
+        authorization.setId(paypalTransaction.getAuthId());
+        Authorization createdAuth = authorization.doVoid(context);
+        System.out.println(createdAuth.toJSON());
+        return true;
+    }
 
-        double refundAmount = paypalTransaction.getAmount();
-        String saleId = paypalTransaction.getSaleId();
-        RefundRequest refundRequest = new RefundRequest();
+    public void transferToSeller(PaypalTransaction paypalTransaction) throws PayPalRESTException {
+        Authorization authorization = new Authorization();
+        authorization.setId(paypalTransaction.getAuthId());
 
         Amount amount = new Amount();
         amount.setCurrency("USD");
-        amount.setTotal(String.valueOf(refundAmount));
-        refundRequest.setAmount(amount);
+        amount.setTotal(String.valueOf(paypalTransaction.getAmount()));
 
-        Sale sale = new Sale();
-        sale.setId(saleId);
+        Capture capture = new Capture();
+        capture.setAmount(amount);
 
-        try {
-            sale.refund(context, refundRequest);
-            refunded = true;
-        } catch (PayPalRESTException e) {
-            System.out.println(e.getDetails());
-        }
-
-        return refunded;
+        Capture responseCapture = authorization.capture(context, capture);
+        System.out.println(responseCapture.toJSON());
     }
 
-    public void transferToSeller() {
-    }
-
-    public void savePaypalTransaction(String saleId, int productId,
+    public void savePaypalTransaction(String authId, int productId,
                                       Integer userId, String paymentId,
                                       String payerId, PaymentEnumType enumType, double amount) {
         PaypalTransaction paypalTransaction = new PaypalTransaction();
@@ -114,9 +113,18 @@ public class PayPalService {
         paypalTransaction.setPaymentEnumType(enumType.name());
         paypalTransaction.setCustomer(customerService.getCustomer(userId).orElseThrow());
         paypalTransaction.setProduct(productService.getProduct(productId).orElseThrow());
-        paypalTransaction.setSaleId(saleId);
+        paypalTransaction.setAuthId(authId);
         paypalTransaction.setAmount(amount);
 
         paypalTransactionRepository.save(paypalTransaction);
+    }
+
+    public void createPaypalAccount(int userId) {
+        LocalPaypalAccount paypalAccount = new LocalPaypalAccount();
+        paypalAccount.setCustomer(customerService.getCustomer(userId).orElseThrow());
+        paypalAccount.setAvailableBalance(5000.0);
+        paypalAccount.setTotalBalance(5000.0);
+        paypalAccount.setTotalWithHeldAmount(0.0);
+        localPayPalAccountRepository.save(paypalAccount);
     }
 }

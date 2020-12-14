@@ -37,9 +37,8 @@ public class BidController {
 
     @RequestMapping("/place/{productId}/{price}")
     @ResponseBody
-    public String placeBid(@PathVariable int productId, @PathVariable double price) {
-        int customerId = 1; //from Session
-        return bidService.placeBid(customerId, productId, price);
+    public String placeBid(@PathVariable int productId, @PathVariable double price, Model model) {
+        return bidService.placeBid((Integer) model.getAttribute("userId"), productId, price);
     }
 
     @RequestMapping("/deposit/{productId}")
@@ -47,24 +46,25 @@ public class BidController {
         double amount = bidService.getDepositAmount(productId);
         Payment payment = payPalService.createPayment(amount, productId, PaymentEnumType.DEPOSIT);
         for (Links link : payment.getLinks()) {
-            if (link.getRel().equals("approval_url")) {
-                return "redirect:" + link.getHref();
-            }
+            if (link.getRel().equals("approval_url")) return "redirect:" + link.getHref();
         }
 
         return "index";
     }
 
-    @RequestMapping("/fullPayment")
-    public String makeFullPayment(@ModelAttribute BidWon bidWon) throws PayPalRESTException {
-        double amount = bidService.getBidBalanceAmount(bidWon.getBidWonId());
+    @RequestMapping("/fullPayment/{bidWonId}")
+    public String customerMakesPayment(@PathVariable int bidWonId) throws PayPalRESTException {
+        BidWon bidWon = bidWonRepository.findById(bidWonId).orElseThrow();
+        double amount = bidService.getBidFinalAmount(bidWon.getBidWonId());
         int productId = bidWon.getProduct().getProductId();
+
+        //Create payment
         Payment payment = payPalService.createPayment(amount, productId, PaymentEnumType.FULL_PAYMENT);
         for (Links link : payment.getLinks()) {
             if (link.getRel().equals("approval_url")) return "redirect:" + link.getHref();
         }
 
-        return "index";
+        return "error";
     }
 
     @GetMapping(PayPalService.SUCCESS_URL + "/{paymentType}/{productId}")
@@ -74,40 +74,41 @@ public class BidController {
                                  @RequestParam("PayerID") String payerId,
                                  Model model) throws PayPalRESTException {
 
-        model.addAttribute("userId", 1);
-        Integer userId = (Integer) model.getAttribute("userId");
+        int userId = (int) model.getAttribute("userId");
 
+        //Authorise payment
+        Payment payment = payPalService.authorizePayment(paymentId, payerId);
+        PaymentEnumType enumType;
 
-        Payment payment = payPalService.executePayment(paymentId, payerId);
-        System.out.println(payment.toJSON());
         if (payment.getState().equals("approved")) {
-            PaymentEnumType enumType = PaymentEnumType.valueOf(paymentType);
+            enumType = PaymentEnumType.valueOf(paymentType);
 
             Transaction transaction = payment.getTransactions().get(0);
             RelatedResources relatedResources = transaction.getRelatedResources().get(0);
-            Sale sale = relatedResources.getSale();
-            String saleId = sale.getId();
-            double amount = Double.parseDouble(sale.getAmount().getTotal());
-            payPalService.savePaypalTransaction(saleId, productId, userId,
-                    paymentId, payerId, enumType, amount);
+            Authorization authorization = relatedResources.getAuthorization();
+            String authId = authorization.getId();
+
+            double amount = Double.parseDouble(authorization.getAmount().getTotal());
+            payPalService.savePaypalTransaction(authId, productId, userId, paymentId, payerId, enumType, amount);
 
             switch (enumType) {
                 case DEPOSIT: {
                     Product product = productService.getProduct(productId).orElseThrow();
+                    //Keep local records about making deposit
                     bidService.makeDeposit(product.getDeposit(), userId, productId);
-                    break;
+                    return "redirect:/product/"+productId;
                 }
                 case FULL_PAYMENT: {
                     BidWon bidWon = bidWonRepository.findBidWonByProduct_ProductId(productId);
+                    //Keep local records about making full payment
                     bidService.makeFullPayment(bidWon);
-                    break;
+                    return "redirect:/customer/bidsWon";
                 }
                 default:
                     break;
             }
         }
-
-        return "redirect:/products/"+productId;
+        return "error";
     }
 
     @RequestMapping(value = "/bidHistory/{productId}", method = RequestMethod.GET)
