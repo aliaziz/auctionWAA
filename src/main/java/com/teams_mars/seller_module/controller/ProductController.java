@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -60,9 +61,9 @@ public class ProductController {
 
     @RequestMapping(value = {"/", "/home"})
     public String showProductLists(Model model) {
-
         List<Product> productList = customerService.viewPagedProductList(0, "startingPrice", false);
         model.addAttribute("isSeller", isSeller());
+//        model.addAttribute("currentUserId", getCurrentUserId());
         model.addAttribute("productList", productList);
         model.addAttribute("isDesc", false);
         return "product/product_list";
@@ -103,6 +104,12 @@ public class ProductController {
             model.addAttribute("category", categoryService.findAll());
             return "product/product_form";
         }
+        StringBuilder catNameList=new StringBuilder();
+        for (Category cat:product.getCategory()){
+            catNameList.append(cat.getName()).append(", ");
+        }
+        product.setCategoryNameList(catNameList.toString());
+
         List<Product> productList = productService.getAllProducts();
         int i =1;
         for(Product prodt: productList){
@@ -143,6 +150,7 @@ public class ProductController {
     public String myProducts(Model model) {
         List<Product> productList = productService.getAllSellerProducts((int) model.getAttribute("userId"));
         model.addAttribute("productList", productList);
+        model.addAttribute("isSeller", isSeller());
         return "product/seller_product_list";
     }
 
@@ -157,6 +165,7 @@ public class ProductController {
         }
         //add product to model
         model.addAttribute("product", product);
+        model.addAttribute("isSeller", isSeller());
         return "product/seller_product_details";
     }
 
@@ -217,6 +226,17 @@ public class ProductController {
         return auth.getAuthorities()
                 .stream()
                 .anyMatch(role -> role.getAuthority().equals("SELLER"));
+    }
+
+    private Integer getCurrentUserId(){
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer userId=0;
+        if(principal instanceof User){
+             userId = ((User)principal).getUserId();
+        }else{
+            String username = principal. toString();
+        }
+        return userId;
     }
 
     @GetMapping("/add")

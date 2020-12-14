@@ -97,11 +97,11 @@ insert into local_paypal_account values ( 333, 4000, 4000, 0, 333);
 insert into local_paypal_account values ( 444, 4000, 4000, 0, 444);
 insert into local_paypal_account values ( 555, 4000, 4000, 0, 555);
 
-insert into product values (1,    to_date('15-12-20','dd-mm-yy')    ,to_date('20-12-20','dd-mm-yy'),    3    ,'A',    'N',    3,  'N',    'N',    'N',    'N',    'N', 'N', 'Charles',  30,    111);
-insert into product values (2,    to_date('16-12-20','dd-mm-yy')    ,to_date('21-12-20','dd-mm-yy'),    3    ,'B',    'N',    3,  'N',    'N',    'N',    'N',    'N', 'N', 'Ali',   30,    222);
-insert into product values (3,    to_date('17-12-20','dd-mm-yy')    ,to_date('22-12-20','dd-mm-yy'),    3    ,'C',    'N',    3,  'N',    'N',    'N',    'N',    'N', 'N', 'Mary',    30,    333);
-insert into product values (4,    to_date('18-12-20','dd-mm-yy')    ,to_date('23-12-20','dd-mm-yy'),    3    ,'D',    'N',    3,  'N',    'N',    'N',    'N',    'N', 'N', 'Halian',   30,    444);
-insert into product values (5,    to_date('19-12-20','dd-mm-yy')    ,to_date('24-12-20','dd-mm-yy'),    3    ,'E',    'N',    3,  'N',    'N',    'N',    'N',    'N', 'N', 'Habtu',   30,    555);
+insert into product values (1,    to_date('15-12-20','dd-mm-yy')    ,to_date('20-12-20','dd-mm-yy'),    'Phones, Laptops, Home',    3    ,'A',    'N',    3,  'N',    'N',    'N',    'N',    'N', 'N', 'Charles',  30,    111);
+insert into product values (2,    to_date('16-12-20','dd-mm-yy')    ,to_date('21-12-20','dd-mm-yy'),    'Phones, Laptops, Home',    3    ,'B',    'N',    3,  'N',    'N',    'N',    'N',    'N', 'N', 'Ali',   30,    222);
+insert into product values (3,    to_date('17-12-20','dd-mm-yy')    ,to_date('22-12-20','dd-mm-yy'),    'Phones, Laptops, Home',    3    ,'C',    'N',    3,  'N',    'N',    'N',    'N',    'N', 'N', 'Mary',    30,    333);
+insert into product values (4,    to_date('18-12-20','dd-mm-yy')    ,to_date('23-12-20','dd-mm-yy'),    'Phones, Laptops, Home',    3    ,'D',    'N',    3,  'N',    'N',    'N',    'N',    'N', 'N', 'Halian',   30,    444);
+insert into product values (5,    to_date('19-12-20','dd-mm-yy')    ,to_date('24-12-20','dd-mm-yy'),    'Phones, Laptops, Home',    3    ,'E',    'N',    3,  'N',    'N',    'N',    'N',    'N', 'N', 'Habtu',   30,    555);
 
 insert into category_product values ( 1, 1 );
 insert into category_product values ( 2, 2 );
