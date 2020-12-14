@@ -4,10 +4,7 @@ create table if not exists persistent_logins (
     token varchar(64) not null,
     last_used timestamp not null
     );
-<<<<<<< HEAD
 
-=======
->>>>>>> 8e74d864cadcaabb778fc05e4c6b41a8b6edb799
 INSERT INTO category(category_id, name) VALUES (1, 'Phones');
 INSERT INTO category(category_id, name) VALUES (2, 'Laptops');
 INSERT INTO category(category_id, name) VALUES (3, 'Home');
