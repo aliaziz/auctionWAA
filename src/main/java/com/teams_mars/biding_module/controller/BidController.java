@@ -53,16 +53,18 @@ public class BidController {
     }
 
     @RequestMapping("/fullPayment/{bidWonId}")
-    public String makeFullPayment(@PathVariable int bidWonId) throws PayPalRESTException {
+    public String customerMakesPayment(@PathVariable int bidWonId) throws PayPalRESTException {
         BidWon bidWon = bidWonRepository.findById(bidWonId).orElseThrow();
-        double amount = bidService.getBidBalanceAmount(bidWon.getBidWonId());
+        double amount = bidService.getBidFinalAmount(bidWon.getBidWonId());
         int productId = bidWon.getProduct().getProductId();
+
+        //Create payment
         Payment payment = payPalService.createPayment(amount, productId, PaymentEnumType.FULL_PAYMENT);
         for (Links link : payment.getLinks()) {
             if (link.getRel().equals("approval_url")) return "redirect:" + link.getHref();
         }
 
-        return "index";
+        return "error";
     }
 
     @GetMapping(PayPalService.SUCCESS_URL + "/{paymentType}/{productId}")
@@ -74,8 +76,10 @@ public class BidController {
 
         int userId = (int) model.getAttribute("userId");
 
+        //Authorise payment
         Payment payment = payPalService.authorizePayment(paymentId, payerId);
-        PaymentEnumType enumType = PaymentEnumType.DEPOSIT;
+        PaymentEnumType enumType;
+
         if (payment.getState().equals("approved")) {
             enumType = PaymentEnumType.valueOf(paymentType);
 
@@ -83,31 +87,28 @@ public class BidController {
             RelatedResources relatedResources = transaction.getRelatedResources().get(0);
             Authorization authorization = relatedResources.getAuthorization();
             String authId = authorization.getId();
+
             double amount = Double.parseDouble(authorization.getAmount().getTotal());
-            payPalService.savePaypalTransaction(authId, productId, userId,
-                    paymentId, payerId, enumType, amount);
+            payPalService.savePaypalTransaction(authId, productId, userId, paymentId, payerId, enumType, amount);
 
             switch (enumType) {
                 case DEPOSIT: {
                     Product product = productService.getProduct(productId).orElseThrow();
+                    //Keep local records about making deposit
                     bidService.makeDeposit(product.getDeposit(), userId, productId);
-                    break;
+                    return "redirect:/products/"+productId;
                 }
                 case FULL_PAYMENT: {
                     BidWon bidWon = bidWonRepository.findBidWonByProduct_ProductId(productId);
+                    //Keep local records about making full payment
                     bidService.makeFullPayment(bidWon);
-                    break;
+                    return "redirect:/customer/bidsWon";
                 }
                 default:
                     break;
             }
         }
-
-        switch (enumType) {
-            case FULL_PAYMENT: return "redirect:/customer/bidsWon";
-            case DEPOSIT: return "redirect:/products/"+productId;
-            default: return "error";
-        }
+        return "error";
     }
 
     @RequestMapping(value = "/bidHistory/{productId}", method = RequestMethod.GET)

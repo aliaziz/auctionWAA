@@ -136,6 +136,8 @@ public class BidServiceImpl implements BidService {
         User user = bidWon.getBidWinner();
         LocalPaypalAccount paypalAccount = localPayPalAccountRepository.findByCustomer_UserId(user.getUserId());
 
+        voidDeposit(user.getUserId(), product.getProductId());
+
         double finalToBePaidAmount = bidWon.getBalanceAmount();
         double currentAvailableBalance = paypalAccount.getAvailableBalance();
 
@@ -174,14 +176,14 @@ public class BidServiceImpl implements BidService {
 
         if (bidWon.isSellerPaid()) return false;
 
-        PaypalTransaction ppTransaction = paypalTransactionRepository
+        PaypalTransaction fullPaymentTransaction = paypalTransactionRepository
                 .findByCustomer_UserIdAndProduct_ProductIdAndPaymentEnumType(
                         bidWon.getBidWinner().getUserId(),
                         bidWon.getProduct().getProductId(),
                         PaymentEnumType.FULL_PAYMENT.name());
 
         try {
-            payPalService.transferToSeller(ppTransaction);
+            payPalService.transferToSeller(fullPaymentTransaction);
         } catch (PayPalRESTException e) {
             e.printStackTrace();
         }
@@ -215,8 +217,8 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    public double getBidBalanceAmount(int bidId) {
-        return bidWonRepository.findById(bidId).orElseThrow().getBalanceAmount();
+    public double getBidFinalAmount(int bidId) {
+        return bidWonRepository.findById(bidId).orElseThrow().getBidFinalAmount();
     }
 
     @Override
@@ -272,6 +274,18 @@ public class BidServiceImpl implements BidService {
     private void chargeDeposit(int userId, int productId) {
         LocalPaypalAccount localPaypalAccount = localPayPalAccountRepository.findByCustomer_UserId(userId);
         Product product = productService.getProduct(productId).orElseThrow();
+
+        PaypalTransaction depositTransaction = paypalTransactionRepository
+                .findByCustomer_UserIdAndProduct_ProductIdAndPaymentEnumType(
+                        userId,
+                        productId,
+                        PaymentEnumType.DEPOSIT.name());
+
+        try {
+            payPalService.transferToSeller(depositTransaction);
+        } catch (PayPalRESTException e) {
+            e.printStackTrace();
+        }
 
         double productDeposit = product.getDeposit();
         double currentWithHeldAmount = localPaypalAccount.getTotalWithHeldAmount();
@@ -345,14 +359,7 @@ public class BidServiceImpl implements BidService {
      * @param productId
      */
     private void returnDeposit(int userId, int productId) {
-        PaypalTransaction paypalTransaction = paypalTransactionRepository
-                .findByCustomer_UserIdAndProduct_ProductIdAndPaymentEnumType(userId, productId, PaymentEnumType.DEPOSIT.name());
-        boolean payPalRefunded = false;
-        try {
-            payPalRefunded = payPalService.refundPayment(paypalTransaction);
-        } catch (PayPalRESTException e) {
-            e.printStackTrace();
-        }
+        boolean payPalRefunded = voidDeposit(userId, productId);
 
         if (payPalRefunded) {
             WithHeldAmount withHeldAmountObj = withHeldRepository
@@ -373,6 +380,19 @@ public class BidServiceImpl implements BidService {
             localPaypalAccount.setAvailableBalance(currentPaypalAvailableBalance);
             localPayPalAccountRepository.save(localPaypalAccount);
         } else throw new RuntimeException("Failed to refund paypal deposit.");
+    }
+
+    private boolean voidDeposit(int userId, int productId) {
+        PaypalTransaction paypalTransaction = paypalTransactionRepository
+                .findByCustomer_UserIdAndProduct_ProductIdAndPaymentEnumType(userId, productId, PaymentEnumType.DEPOSIT.name());
+
+        boolean payPalRefunded = false;
+        try {
+            payPalRefunded = payPalService.refundPayment(paypalTransaction);
+        } catch (PayPalRESTException e) {
+            e.printStackTrace();
+        }
+        return payPalRefunded;
     }
 
     @Scheduled(fixedDelay = 120000, initialDelay = 60000)
@@ -403,6 +423,7 @@ public class BidServiceImpl implements BidService {
                 .filter(bidWon -> LocalDateTime.now().isAfter(bidWon.getPaymentDueDate()))
                 .forEach(bidWon -> {
                     chargeDeposit(bidWon.getBidWinner().getUserId(), bidWon.getProduct().getProductId());
+                    bidWonRepository.delete(bidWon);
                 });
     }
 

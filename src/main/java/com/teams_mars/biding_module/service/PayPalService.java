@@ -84,7 +84,8 @@ public class PayPalService {
     public boolean refundPayment(PaypalTransaction paypalTransaction) throws PayPalRESTException {
         Authorization authorization = new Authorization();
         authorization.setId(paypalTransaction.getAuthId());
-        System.out.println(authorization.doVoid(context));
+        Authorization createdAuth = authorization.doVoid(context);
+        System.out.println(createdAuth.toJSON());
         return true;
     }
 
