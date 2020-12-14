@@ -207,8 +207,8 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    public BidWon getInvoice(int customerId, int productId) {
-        return bidWonRepository.findBidWonByProduct_ProductIdAndBidWinner_UserId(productId, customerId);
+    public BidWon getInvoice(int bidWonId) {
+        return bidWonRepository.findById(bidWonId).orElseThrow();
     }
 
     @Override
@@ -429,7 +429,7 @@ public class BidServiceImpl implements BidService {
 
     /**
      * Scheduler to check if seller has shipped the product yet.
-     * Checks if customer paid, if product is shipped and today's date is higher than 3days since the
+     * Checks if customer paid and product not shipped after 3 days.
      * customer paid for the product.
      */
     @Scheduled(fixedDelay = 500000, initialDelay = 150000)

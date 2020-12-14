@@ -17,6 +17,7 @@ public interface ProductService {
     List<Product> getAllProductsByPage(int pageNum, String attr, boolean isDesc);
     List<Product> searchProductsByName(int pageNum, String keyWord);
     List<String> getProductImages(int productId);
+    String getOneProductImage(int productId);
     List<Product> getAllSellerProducts(int id);
 
 }

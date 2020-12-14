@@ -61,9 +61,8 @@ public class ProductController {
 
     @RequestMapping(value = {"/", "/home"})
     public String showProductLists(Model model) {
-        List<Product> productList = customerService.viewPagedProductList(0, "startingPrice", false);
-        model.addAttribute("isSeller", isSeller());
-//        model.addAttribute("currentUserId", getCurrentUserId());
+
+        List<Product> productList = productService.getAllProductsByPage(0, "startingPrice", false);
         model.addAttribute("productList", productList);
         model.addAttribute("isDesc", false);
         return "product/product_list";
@@ -75,7 +74,7 @@ public class ProductController {
                                         @PathVariable Boolean isDesc,
                                         Model model) {
 
-        List<Product> productList = customerService.viewPagedProductList(pageNum, attr, isDesc);
+        List<Product> productList = productService.getAllProductsByPage(pageNum, attr, isDesc);
         model.addAttribute("isDesc", isDesc);
         model.addAttribute("productList", productList);
         return "product/product_list";
@@ -84,7 +83,7 @@ public class ProductController {
     @RequestMapping("/search")
     public String searchProducts(@RequestParam String query, Model model) {
 
-        List<Product> productList = customerService.searchPagedProducts(0, query);
+        List<Product> productList = productService.searchProductsByName(0, query);
         model.addAttribute("productList", productList);
         return "product/product_list";
     }
@@ -165,7 +164,7 @@ public class ProductController {
         }
         //add product to model
         model.addAttribute("product", product);
-        model.addAttribute("isSeller", isSeller());
+        model.addAttribute("imageList", productService.getProductImages(productId));
         return "product/seller_product_details";
     }
 
@@ -241,29 +240,18 @@ public class ProductController {
         return "0";
     }
 
-    private boolean isSeller() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth.getAuthorities()
-                .stream()
-                .anyMatch(role -> role.getAuthority().equals("SELLER"));
-    }
-
-    private Integer getCurrentUserId() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Integer userId = 0;
-        if (principal instanceof User) {
-            userId = ((User) principal).getUserId();
-        } else {
-            String username = principal.toString();
-        }
-        return userId;
-    }
-
     @GetMapping("/add")
     public String inputProduct(@ModelAttribute("product") Product product, Model model) {
         List<Category> category = categoryService.findAll();
         model.addAttribute("product", product);
         model.addAttribute("category", category);
         return "product/product_form";
+    }
+
+    public static boolean isSeller() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth.getAuthorities()
+                .stream()
+                .anyMatch(role -> role.getAuthority().equals("SELLER"));
     }
 }

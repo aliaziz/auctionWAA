@@ -47,8 +47,8 @@ The above copyright notice and this permission notice shall be included in all c
                             <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
                         </ol>
                         <div class="carousel-inner">
-                            <div class="carousel-item" th:each="image, idx: ${imageList}">
-                                <img class="d-block w-100" style="height: 500px" th:src="@{'/uploads/'+ ${product.name} +'/'+${image}}" th:alt="slide" alt="image">
+                            <div class="carousel-item" th:each="image, idx: ${imageList}" th:classappend="${idx.first} ? active : ''">
+                                <img class="d-block w-100" style="height: 500px" th:src="@{${image}}" th:alt="slide" alt="image">
                             </div>
                         </div>
                         <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
