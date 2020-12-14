@@ -3,6 +3,7 @@ package com.teams_mars._global_domain;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Data
@@ -12,7 +13,6 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "role_id")
     private Long id;
-
     @Column(name = "role")
     private String role;
 

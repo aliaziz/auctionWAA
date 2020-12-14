@@ -1,6 +1,7 @@
 $(document).ready(function (){
-    $("#resendButtton").click(function (event){
+    $("#resend").click(function (event){
     event.preventDefault();
+    console.log("in the resend method");
         var user_id = $(this).attr("data");
     $.ajax({
         url: 'http://localhost:8888/resendVerificationCode/'+user_id,
@@ -19,6 +20,7 @@ $(document).ready(function (){
 
     $("#sendPassword").click(function (event){
        event.preventDefault();
+       console.log("in js");
        var emailAddress = document.getElementById("resetPass").value
 
         $.ajax({

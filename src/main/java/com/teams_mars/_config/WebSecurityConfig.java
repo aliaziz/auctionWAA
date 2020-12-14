@@ -30,28 +30,30 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.jdbcAuthentication()
-//                .usersByUsernameQuery(usersQuery)
-//                .authoritiesByUsernameQuery(rolesQuery)
-//                .dataSource(dataSource)
-//                .passwordEncoder(getPasswordEncoder());
 
-        auth.inMemoryAuthentication()
-                .withUser("user")
-                .password("abc")
-                .roles("USER");
+        auth.jdbcAuthentication()
+                .usersByUsernameQuery(usersQuery)
+                .authoritiesByUsernameQuery(rolesQuery)
+                .dataSource(dataSource)
+                .passwordEncoder(getPasswordEncoder());
+//
+//        auth.inMemoryAuthentication()
+//                .withUser("user")
+//                .password("abc")
+//                .roles("USER");
     }
+
 
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
-                .antMatchers("/resources/**", "/static/**", "/css/**", "/img/faces/*","/img/*","/js/**");
+                .antMatchers("/resources/**", "/static/**", "/css/**", "/img/faces/*","/img/*","/js/**","/static/js/registration/*");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/","/register","/ResetPassword","/verifyFromEmail",
+                .antMatchers("/","/register","/admin-login","/ResetPassword","/verifyFromEmail",
                         "/resendVerificationCode/*","/user/sendEmail/*","/user/changePassword","/error/*",
                         "/registerSuccess","/verifyAccount","/h2-console/**","/db/**")
                 .permitAll()
@@ -79,15 +81,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().disable();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-    }
-
 //    @Bean
-//    public PasswordEncoder getPasswordEncoder(){
-//        return new BCryptPasswordEncoder();
+//    public PasswordEncoder passwordEncoder() {
+//        return NoOpPasswordEncoder.getInstance();
 //    }
+
+    @Bean
+    public PasswordEncoder getPasswordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public PersistentTokenRepository tokenRepository() {
