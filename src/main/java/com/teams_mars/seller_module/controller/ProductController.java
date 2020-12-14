@@ -1,5 +1,6 @@
 package com.teams_mars.seller_module.controller;
 
+import com.teams_mars._global_domain.User;
 import com.teams_mars.admin_module.domain.Category;
 import com.teams_mars.admin_module.impl.CategoryService;
 import com.teams_mars.biding_module.service.BidService;
@@ -130,9 +131,12 @@ public class ProductController {
         }
         product.setImagePath(path.toString());
 //        productRepository.save(product);
+        Integer userId = (Integer) model.getAttribute("userId");
+        User owner = customerService.getCustomer(userId).orElseThrow();
+        product.setOwner(owner);
         productService.saveProduct(product);
         redirectAttributes.addFlashAttribute("msg", "Product Successfully Added!!.");
-        return "redirect:/myProducts";
+        return "redirect:/product/myProducts";
     }
 
     @GetMapping("/myProducts")
