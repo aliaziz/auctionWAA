@@ -3,7 +3,6 @@ package com.teams_mars.seller_module.service;
 import com.teams_mars.seller_module.domain.Product;
 import com.teams_mars.seller_module.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -43,12 +41,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> getAllSellerProducts(int id) {
-        return productRepository.findAllByOwner_UserId(id);
+        List<Product> list = productRepository.findAllByOwner_UserId(id);
+        list.forEach(p -> p.setImagePath(getOneProductImage(p.getProductId())));
+        return list;
     }
 
     @Override
     public List<Product> getActiveProducts() {
-        return productRepository.getActiveProducts();
+        List<Product> list = productRepository.getActiveProducts();
+        list.forEach(p -> p.setImagePath(getOneProductImage(p.getProductId())));
+        return list;
     }
 
     @Override
@@ -57,8 +59,10 @@ public class ProductServiceImpl implements ProductService {
         if (!isDesc) sort.ascending();
 
         Pageable pageable = PageRequest.of(pageNum, 6, sort);
-        Page<Product> productList = productRepository.findAll(pageable);
-        return productList.toList()
+        List<Product> productList = productRepository.findAll(pageable).toList();
+        productList.forEach(p -> p.setImagePath(getOneProductImage(p.getProductId())));
+
+        return productList
                 .stream()
                 .filter(product -> !product.isClosed())
                 .filter(product -> LocalDateTime.now().isBefore(product.getBidDueDate()))
@@ -68,23 +72,33 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> searchProductsByName(int pageNum, String keyWord) {
         Pageable pageable = PageRequest.of(pageNum,3);
-        Page<Product> productList = productRepository.findAllByNameIsLike(keyWord, pageable);
-        return productList.toList();
+        List<Product> productList = productRepository.findAllByNameIsLike(keyWord, pageable).toList();
+        productList.forEach(p -> p.setImagePath(getOneProductImage(p.getProductId())));
+        return productList;
     }
 
     @Override
     public List<String> getProductImages(int productId) {
         Product product = productRepository.findById(productId).orElseThrow();
+        String [] imagePaths = getFolderImages(productId);
         String imagesFolder = product.getImagePath();
-        String [] imagePaths;
-
-        File file = new File(imagesFolder);
-        imagePaths = file.list();
 
         List<String> imagePathsList = new ArrayList<>();
-        if (imagePaths != null) Collections.addAll(imagePathsList, imagePaths);
+        if (imagePaths != null) {
+            for (String imageName : imagePaths) {
+                String shortPath = imagesFolder.substring(imagesFolder.indexOf("/uploads/"));
+                imagePathsList.add(shortPath+"/"+imageName);
+            }
+        }
 
         return imagePathsList;
+    }
+
+    @Override
+    public String getOneProductImage(int productId) {
+        List<String> productImages = getProductImages(productId);
+        if (productImages.size() > 0) return productImages.get(0);
+        return "";
     }
 
     @Override
@@ -93,5 +107,12 @@ public class ProductServiceImpl implements ProductService {
         return productByName;
     }
 
+    private String [] getFolderImages(int productId) {
+        Product product = productRepository.findById(productId).orElseThrow();
+        String imagesFolder = product.getImagePath();
+
+        File file = new File(imagesFolder);
+        return file.list();
+    }
 
 }

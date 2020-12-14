@@ -62,7 +62,6 @@ public class ProductController {
     public String showProductLists(Model model) {
 
         List<Product> productList = productService.getAllProductsByPage(0, "startingPrice", false);
-        model.addAttribute("isSeller", isSeller());
         model.addAttribute("productList", productList);
         model.addAttribute("isDesc", false);
         return "product/product_list";
@@ -157,6 +156,7 @@ public class ProductController {
         }
         //add product to model
         model.addAttribute("product", product);
+        model.addAttribute("imageList", productService.getProductImages(productId));
         return "product/seller_product_details";
     }
 
@@ -212,18 +212,18 @@ public class ProductController {
         return "0";
     }
 
-    private boolean isSeller() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth.getAuthorities()
-                .stream()
-                .anyMatch(role -> role.getAuthority().equals("SELLER"));
-    }
-
     @GetMapping("/add")
     public String inputProduct(@ModelAttribute("product") Product product, Model model){
         List<Category> category = categoryService.findAll();
         model.addAttribute("product", product);
         model.addAttribute("category", category);
         return "product/product_form";
+    }
+
+    public static boolean isSeller() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth.getAuthorities()
+                .stream()
+                .anyMatch(role -> role.getAuthority().equals("SELLER"));
     }
 }

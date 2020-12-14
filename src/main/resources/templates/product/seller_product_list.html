@@ -33,7 +33,7 @@ The above copyright notice and this permission notice shall be included in all c
                             <a th:href="@{/product/myProducts/{productId}(productId = ${product.productId})}">
                                 <figure>
                                     <div class="overlay"><i class="ti-plus"></i></div>
-                                    <img th:src="@{/img/bg2.jpg}" alt="Image" class="img-responsive">
+                                    <img th:src="@{${product.imagePath}}" alt="Image" class="img-responsive">
                                 </figure>
                                 <div class="fh5co-text">
                                     <h2><span th:text="${product.description}"></span></h2>
